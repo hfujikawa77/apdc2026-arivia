@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Arivia: Water-Surface Drone Shows with ArduPilot</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
+<link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
+<script src="../theme.js"></script>
 <style>
-  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; }
+  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; --line:#2c3e4e; --sunk:#1b2733; --ph-bg:#10171e; --ph-line:#3a4a5a; --chip:#22313f; }
+  :root.light { --accent:#0b6fa8; --accent2:#b85400; --muted:#566370; --box:#eef3f7; --line:#c3cfd9; --sunk:#e3eaf0; --ph-bg:#f3f6f9; --ph-line:#aab8c4; --chip:#dde5ec; }
   .reveal { font-size: 34px; }
   .reveal h1, .reveal h2 { text-transform: none; letter-spacing: 0; }
   .reveal h1 { font-size: 1.9em; }
@@ -18,17 +20,17 @@
   .reveal li { margin: .35em 0; }
   .sub { color: var(--muted); font-size: .7em; }
   .hl { color: var(--accent2); }
-  code { color: var(--accent2); background: #1b2733; padding: 0 .25em; border-radius: 4px; font-size: .85em; }
+  code { color: var(--accent2); background: var(--sunk); padding: 0 .25em; border-radius: 4px; font-size: .85em; }
   .flow { display:flex; align-items:center; gap:.4em; flex-wrap:wrap; font-size:.6em; margin:.6em 0; }
-  .flow .n { background:var(--box); border:1px solid #2c3e4e; border-radius:8px; padding:.4em .6em; text-align:center; }
+  .flow .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.4em .6em; text-align:center; }
   .flow .a { color:var(--muted); }
   .cols { display:flex; gap:1em; }
   .cols > div { flex:1; }
-  .ph { border:2px dashed #3a4a5a; border-radius:10px; color:var(--muted); font-size:.6em;
-        padding:1.6em 1em; text-align:center; background:#10171e; }
-  .tag { display:inline-block; font-size:.55em; background:#22313f; border-radius:6px; padding:.1em .5em; color:var(--muted); }
+  .ph { border:2px dashed var(--ph-line); border-radius:10px; color:var(--muted); font-size:.6em;
+        padding:1.6em 1em; text-align:center; background:var(--ph-bg); }
+  .tag { display:inline-block; font-size:.55em; background:var(--chip); border-radius:6px; padding:.1em .5em; color:var(--muted); }
   .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:.6em; align-items:stretch; }
-  .arch .n { background:var(--box); border:1px solid #2c3e4e; border-radius:8px; padding:.6em; }
+  .arch .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.6em; }
   .arch h3 { font-size:1em; margin:0 0 .3em 0; color:var(--accent); text-transform:none; }
   .arch ul { margin-left:1em; }
   .arch li { margin:.15em 0; }
@@ -38,7 +40,7 @@
   .bars { font-size:.6em; margin:.4em 0 .6em; }
   .bars .row { display:flex; align-items:center; gap:.6em; margin:.35em 0; }
   .bars .lbl { width:9em; color:var(--muted); }
-  .bars .track { flex:1; background:#1b2733; border-radius:4px; height:1.1em; position:relative; }
+  .bars .track { flex:1; background:var(--sunk); border-radius:4px; height:1.1em; position:relative; }
   .bars .fill { background:var(--accent); height:100%; border-radius:4px; }
   .bars .fill.lat { background:var(--accent2); }
   .bars .val { width:7em; text-align:right; }
