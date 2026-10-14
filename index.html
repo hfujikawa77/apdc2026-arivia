@@ -40,7 +40,7 @@
 <script>
   var T = { dark: ['black','night','moon','league','blood','dracula'],
             light: ['white','simple','beige','sky','solarized','serif'] };
-  var cur = 'black';
+  var cur = 'dracula';
   try { cur = localStorage.getItem('arivia-theme') || cur; } catch (e) {}
   Object.keys(T).forEach(function (g) {
     var box = document.getElementById(g);
