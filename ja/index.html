@@ -35,6 +35,13 @@
   .pit li b { color: var(--accent2); }
   .vid iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
   .vid .cap { font-size:.55em; color:var(--muted); margin-top:.3em; }
+  .bars { font-size:.6em; margin:.4em 0 .6em; }
+  .bars .row { display:flex; align-items:center; gap:.6em; margin:.35em 0; }
+  .bars .lbl { width:9em; color:var(--muted); }
+  .bars .track { flex:1; background:#1b2733; border-radius:4px; height:1.1em; position:relative; }
+  .bars .fill { background:var(--accent); height:100%; border-radius:4px; }
+  .bars .fill.lat { background:var(--accent2); }
+  .bars .val { width:7em; text-align:right; }
 </style>
 </head>
 <body>
@@ -45,7 +52,7 @@
   <h1>Arivia</h1>
   <h2>ArduPilot で動かす水上ドローンショー</h2>
   <p class="sub">ArduPilot Developers Conference 2026 · Ottawa</p>
-  <p class="sub">[氏名 / 所属]</p>
+  <p class="sub">Hideyuki Fujikawa · Drone Japan</p>
   <aside class="notes">0:30 — LED と噴水を載せた浮かぶドローンを Rover で動かしています。今日は、それが何か、どう横に動かしたか、学んだこと。</aside>
 </section>
 
@@ -55,10 +62,10 @@
   <div class="cols">
     <div>
       <ul>
-        <li><span class="hl">スペースワン社</span>(日本)の自律型水上ドローン</li>
+        <li><a href="https://spacexone.com/" target="_blank"><span class="hl">スペースワン社</span></a>(日本)の自律型水上ドローン</li>
         <li>LED + 噴水 + GPS 航行</li>
         <li>複数台で同期ショー</li>
-        <li>CES Innovation Awards 2026 <span class="hl">Honoree</span>(Drones 部門)</li>
+        <li><a href="https://www.ces.tech/ces-innovation-awards/2026/arivia-water-surface-light-and-fountain-drone/" target="_blank">CES Innovation Awards 2026</a> <span class="hl">Honoree</span>(Drones 部門)</li>
         <li>ArduPilot Rover · Cube Orange · X フレームスラスタ</li>
       </ul>
     </div>
@@ -119,49 +126,53 @@
   <aside class="notes">1:30 — 図 1 枚 + 3 点。lateral_base が 0 固定で、抗力補償がなかった。</aside>
 </section>
 
-<!-- 6. 試験とログ解析 (1:15) -->
+<!-- 6. 横移動は動いたか (1:15) -->
 <section>
-  <h2>試験とログ解析</h2>
-  <p>SITL → ベンチ → 水上</p>
+  <h2>横移動は動いたか?</h2>
   <div class="cols">
     <div>
+      <p class="sub">Guided GoTo ×22、測位: みちびきのみ</p>
       <ul>
-        <li>スラスタ動作中に <code>EKF3 ground mag anomaly</code></li>
-        <li>Yaw が<span class="hl">約 6 秒で 135° 以上</span>ジャンプ</li>
-        <li>モーター 1 本が約 60 秒飽和</li>
-        <li>原因は制御ではなく<span class="hl">コンパス干渉</span></li>
-        <li>安定化後は短距離の横移動が成功</li>
+        <li><span class="hl">22 / 22 回 到達</span></li>
+        <li>ただし横は<span class="hl">遅い</span>(目標 2.0 m/s):</li>
       </ul>
+      <div class="bars"><div class="row"><span class="lbl">横のみ</span><div class="track"><div class="fill lat" style="width:32.5%"></div></div><span class="val">0.22–0.31 m/s</span></div><div class="row"><span class="lbl">前後混合</span><div class="track"><div class="fill " style="width:65.0%"></div></div><span class="val">0.40–0.65 m/s</span></div><div class="row"><span class="lbl">前進のみ</span><div class="track"><div class="fill " style="width:67.5%"></div></div><span class="val">0.54 m/s</span></div></div>
+      <p class="sub">ショー(3 台): プログラムに追従。終端残差 0.30 / 1.18 / 0.40 m</p>
     </div>
     <div>
-      <div class="ph">[ログのグラフ: YAW]<br>log_YAW.png</div>
+      <p><span class="tag">考えられる原因(未検証)</span></p>
+      <ul>
+        <li><span class="hl">横方向の FF なし</span>(<code>lateral_base = 0</code>)</li>
+        <li><code>ATC_LAT_P/I</code> = 0.20(前後の流用)</li>
+        <li><code>ATC_ACCEL_MAX</code> 共有 + 短距離</li>
+      </ul>
+      <p class="sub">ログ: 固定ヘディングは正しく設定。ただし PIDL なし・<code>ATT.DesYaw</code> = 0 → 追従が見えない</p>
     </div>
   </div>
-  <p class="sub">併せて判明: 横 PID のログ (PIDL) がない / <code>ATT.DesYaw</code> に固定ヘディングが出ない</p>
-  <aside class="notes">1:15 — 電気・磁気的な配置は制御器と同じくらい重要。未解決(チューニング、ログ)も言う。</aside>
+  <aside class="notes">1:15 — 動いた。でも遅い。横 PID がログされないので、理由を証明しきれていない。次: FF 実装、ログ追加、ATC_LAT_P/I 調整。</aside>
 </section>
 
-<!-- 7. シミュレータ + RTK (1:00) -->
+<!-- 7. シミュレータ + 測位 (1:00) -->
 <section>
-  <h2>ショーシミュレータと RTK の学び</h2>
+  <h2>3D ショーシミュレータと測位</h2>
   <div class="cols">
     <div>
       <ul>
-        <li>SITL ×N + GCS + Unit を 1 台で起動</li>
-        <li>同じ JSON ショーをシミュレーションで実行</li>
+        <li>実機を試す機会が少なく、ショーの中身を十分にテストできなかった</li>
+        <li><span class="hl">3D シミュレータ</span>を作成: SITL(<code>rover-omni3mecanum</code>)+ 横移動ファーム(Claude Code で開発)</li>
       </ul>
       <div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">3D ドローンショーシミュレータ</div></div>
     </div>
     <div>
-      <p><span class="tag">RTK</span></p>
+      <p><span class="tag">測位</span></p>
       <ul>
-        <li>基準局 F9P が Survey-In でない → <span class="hl">RTCM 1005 が出ない</span> → RTK Fix しない</li>
-        <li>Tip: RTCM を覗いて 1005 を確認</li>
-        <li><code>GPS_INJECT_DATA</code> → <code>GPS_RTCM_DATA</code> に変更</li>
+        <li>国内: <span class="hl">みちびきのみ</span>で良好(Status 6 約 70%、HDOP 約 0.8)</li>
+        <li>海外デモ → <span class="hl">RTK</span> が必要(自前の基準局 + RTCM)</li>
+        <li>学び: RTCM 1005 が出ないと Fix しない</li>
       </ul>
     </div>
   </div>
-  <aside class="notes">1:00 — RTK は 1 行で。RTK Fixed にならないなら、1005 があるか確認。</aside>
+  <aside class="notes">1:00 — なぜシミュレータか → 測位は 1 行で。RTK Fixed にならないなら 1005 を確認。</aside>
 </section>
 
 <!-- 8. まとめ (0:45) -->

@@ -35,6 +35,13 @@
   .pit li b { color: var(--accent2); }
   .vid iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
   .vid .cap { font-size:.55em; color:var(--muted); margin-top:.3em; }
+  .bars { font-size:.6em; margin:.4em 0 .6em; }
+  .bars .row { display:flex; align-items:center; gap:.6em; margin:.35em 0; }
+  .bars .lbl { width:9em; color:var(--muted); }
+  .bars .track { flex:1; background:#1b2733; border-radius:4px; height:1.1em; position:relative; }
+  .bars .fill { background:var(--accent); height:100%; border-radius:4px; }
+  .bars .fill.lat { background:var(--accent2); }
+  .bars .val { width:7em; text-align:right; }
 </style>
 </head>
 <body>
@@ -45,7 +52,7 @@
   <h1>Arivia</h1>
   <h2>Water-Surface Drone Shows with ArduPilot</h2>
   <p class="sub">ArduPilot Developers Conference 2026 · Ottawa</p>
-  <p class="sub">[Name / Affiliation]</p>
+  <p class="sub">Hideyuki Fujikawa · Drone Japan</p>
   <aside class="notes">0:30 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
 </section>
 
@@ -55,10 +62,10 @@
   <div class="cols">
     <div>
       <ul>
-        <li>Autonomous water-surface drone by <span class="hl">Space One</span> (Japan)</li>
+        <li>Autonomous water-surface drone by <a href="https://spacexone.com/" target="_blank"><span class="hl">Space One</span></a> (Japan)</li>
         <li>LEDs + fountain + GPS navigation</li>
         <li>Multiple units, synchronized shows</li>
-        <li>CES Innovation Awards 2026 <span class="hl">Honoree</span> (Drones)</li>
+        <li><a href="https://www.ces.tech/ces-innovation-awards/2026/arivia-water-surface-light-and-fountain-drone/" target="_blank">CES Innovation Awards 2026</a> <span class="hl">Honoree</span> (Drones)</li>
         <li>ArduPilot Rover · Cube Orange · X-frame thrusters</li>
       </ul>
     </div>
@@ -119,49 +126,53 @@
   <aside class="notes">1:30 — One diagram, three bullets. Lateral base was hard-coded 0, so no drag compensation.</aside>
 </section>
 
-<!-- 6. Test & logs (1:15) -->
+<!-- 6. Did lateral move work? (1:15) -->
 <section>
-  <h2>Test &amp; log analysis</h2>
-  <p>SITL → bench → on water</p>
+  <h2>Did lateral move work?</h2>
   <div class="cols">
     <div>
+      <p class="sub">Guided GoTo ×22, positioning: QZSS only</p>
       <ul>
-        <li><code>EKF3 ground mag anomaly</code> while thrusters ran</li>
-        <li>Yaw jumped <span class="hl">&gt;135° in ~6 s</span></li>
-        <li>One motor saturated ~60 s</li>
-        <li>Root cause: <span class="hl">compass interference</span>, not the controller</li>
-        <li>After stabilizing: short lateral moves succeeded</li>
+        <li><span class="hl">22 / 22 reached</span> the target</li>
+        <li>But lateral is <span class="hl">slow</span> (target 2.0 m/s):</li>
       </ul>
+      <div class="bars"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:32.5%"></div></div><span class="val">0.22–0.31 m/s</span></div><div class="row"><span class="lbl">Mixed</span><div class="track"><div class="fill " style="width:65.0%"></div></div><span class="val">0.40–0.65 m/s</span></div><div class="row"><span class="lbl">Forward only</span><div class="track"><div class="fill " style="width:67.5%"></div></div><span class="val">0.54 m/s</span></div></div>
+      <p class="sub">Show (3 boats): followed the program; end residual 0.30 / 1.18 / 0.40 m</p>
     </div>
     <div>
-      <div class="ph">[LOG GRAPH: YAW]<br>log_YAW.png</div>
+      <p><span class="tag">Likely causes — not verified yet</span></p>
+      <ul>
+        <li><span class="hl">No lateral feed-forward</span> (<code>lateral_base = 0</code>)</li>
+        <li><code>ATC_LAT_P/I</code> = 0.20, copied from forward</li>
+        <li>Shared <code>ATC_ACCEL_MAX</code> + short moves</li>
+      </ul>
+      <p class="sub">Logs: fixed heading is set correctly, but no PIDL log and <code>ATT.DesYaw</code> = 0 → tracking can't be seen</p>
     </div>
   </div>
-  <p class="sub">Also found: no lateral PID log (PIDL); <code>ATT.DesYaw</code> ignores fixed heading</p>
-  <aside class="notes">1:15 — Electrical/magnetic layout matters as much as the controller. Say what is still open: tuning, logging.</aside>
+  <aside class="notes">1:15 — It moved, but slowly, and we can't fully prove why because the lateral PID isn't logged. Next: add feed-forward, add the log, tune ATC_LAT_P/I.</aside>
 </section>
 
-<!-- 7. Simulator + RTK (1:00) -->
+<!-- 7. Simulator + positioning (1:00) -->
 <section>
-  <h2>Show simulator &amp; an RTK lesson</h2>
+  <h2>3D show simulator &amp; positioning</h2>
   <div class="cols">
     <div>
       <ul>
-        <li>SITL ×N + GCS + Unit on one machine</li>
-        <li>Same JSON show runs in simulation</li>
+        <li>Few chances to test the real boat → show content not fully tested</li>
+        <li>Built a <span class="hl">3D simulator</span>: SITL (<code>rover-omni3mecanum</code>) + lateral-move firmware, with Claude Code</li>
       </ul>
       <div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">3D show simulator</div></div>
     </div>
     <div>
-      <p><span class="tag">RTK</span></p>
+      <p><span class="tag">Positioning</span></p>
       <ul>
-        <li>Base F9P not in Survey-In → <span class="hl">no RTCM 1005</span> → no RTK Fix</li>
-        <li>Tip: sniff the RTCM stream and look for 1005</li>
-        <li>Moved <code>GPS_INJECT_DATA</code> → <code>GPS_RTCM_DATA</code></li>
+        <li>In Japan: <span class="hl">QZSS (Michibiki) only</span> worked well (Status 6 ≈ 70%, HDOP ≈ 0.8)</li>
+        <li>Overseas demo → <span class="hl">RTK</span> needed (own base + RTCM)</li>
+        <li>Lesson: no RTCM 1005 → no Fix</li>
       </ul>
     </div>
   </div>
-  <aside class="notes">1:00 — RTK in one line: if you never reach RTK Fixed, check that message 1005 is present.</aside>
+  <aside class="notes">1:00 — Why a simulator, then one line on positioning. Tip: if you never reach RTK Fixed, check for message 1005.</aside>
 </section>
 
 <!-- 8. Summary (0:45) -->
