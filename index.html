@@ -5,18 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Arivia: Water-Surface Drone Shows with ArduPilot</title>
 <style>
-  body { font-family: system-ui, sans-serif; background:#111; color:#eee; max-width:36em; margin:4em auto; padding:0 1em; }
-  a { color:#4cc3ff; font-size:1.2em; }
-  li { margin:.6em 0; }
+  body { font-family: system-ui, sans-serif; background:#111; color:#eee; max-width:40em; margin:3em auto; padding:0 1em; }
+  h1 { margin-bottom:.2em; }
+  h2 { font-size:1em; color:#9aa7b4; font-weight:600; margin:2em 0 .6em; }
   p { color:#9aa7b4; }
+  .btn { display:inline-block; padding:.45em 1em; border-radius:8px; border:1px solid #2c3e4e; background:#16212b;
+         color:#4cc3ff; text-decoration:none; font-size:1em; }
+  .btn:hover, .btn:focus-visible { background:#1f3142; border-color:#4cc3ff; }
+  .btn.main { font-size:1.15em; padding:.6em 1.3em; }
+  .row { display:flex; flex-wrap:wrap; gap:.6em; }
+  .themes { display:grid; grid-template-columns:repeat(auto-fill, minmax(11em, 1fr)); gap:.8em; }
+  .card { border:1px solid #2c3e4e; border-radius:10px; padding:.7em; background:#14191f; }
+  .card b { display:block; margin-bottom:.5em; }
+  .card .btn { padding:.3em .8em; font-size:.9em; margin-right:.3em; }
+  .card.on { border-color:#4cc3ff; }
 </style>
 </head>
 <body>
 <h1>Arivia</h1>
 <p>Water-Surface Drone Shows with ArduPilot — ArduPilot Developers Conference 2026, Ottawa</p>
-<ul>
-  <li><a href="en/">Slides (English)</a></li>
-  <li><a href="ja/">スライド (日本語)</a></li>
-</ul>
+
+<h2>Slides</h2>
+<div class="row">
+  <a class="btn main" href="en/">Slides (English)</a>
+  <a class="btn main" href="ja/">スライド (日本語)</a>
+</div>
+
+<h2>Dark themes</h2>
+<div class="themes" id="dark"></div>
+<h2>Light themes</h2>
+<div class="themes" id="light"></div>
+<p style="font-size:.85em">The chosen theme is remembered in this browser. Add <code>?theme=night</code> to a slide URL to switch directly.</p>
+
+<script>
+  var T = { dark: ['black','night','moon','league','blood','dracula'],
+            light: ['white','simple','beige','sky','solarized','serif'] };
+  var cur = 'black';
+  try { cur = localStorage.getItem('arivia-theme') || cur; } catch (e) {}
+  Object.keys(T).forEach(function (g) {
+    var box = document.getElementById(g);
+    T[g].forEach(function (t) {
+      var d = document.createElement('div');
+      d.className = 'card' + (t === cur ? ' on' : '');
+      d.innerHTML = '<b>' + t + '</b>' +
+        '<a class="btn" href="en/?theme=' + t + '">EN</a>' +
+        '<a class="btn" href="ja/?theme=' + t + '">JA</a>';
+      box.appendChild(d);
+    });
+  });
+</script>
 </body>
 </html>
