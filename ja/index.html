@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Arivia: ArduPilot で動かす水上ドローンショー</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
+<style>
+  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; }
+  .reveal { font-size: 32px; font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif; }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: inherit; text-transform: none; letter-spacing: 0; }
+  .reveal h1 { font-size: 1.9em; }
+  .reveal h2 { font-size: 1.3em; color: var(--accent); margin-bottom: .6em; }
+  .reveal section { text-align: left; }
+  .reveal section.center-slide { text-align: center; }
+  .reveal ul { display: block; margin-left: 1em; }
+  .reveal li { margin: .35em 0; }
+  .sub { color: var(--muted); font-size: .7em; }
+  .hl { color: var(--accent2); }
+  code { color: var(--accent2); background: #1b2733; padding: 0 .25em; border-radius: 4px; font-size: .85em; }
+  .flow { display:flex; align-items:center; gap:.4em; flex-wrap:wrap; font-size:.6em; margin:.6em 0; }
+  .flow .n { background:var(--box); border:1px solid #2c3e4e; border-radius:8px; padding:.4em .6em; text-align:center; }
+  .flow .a { color:var(--muted); }
+  .cols { display:flex; gap:1em; }
+  .cols > div { flex:1; }
+  .ph { border:2px dashed #3a4a5a; border-radius:10px; color:var(--muted); font-size:.6em;
+        padding:1.6em 1em; text-align:center; background:#10171e; }
+  .tag { display:inline-block; font-size:.55em; background:#22313f; border-radius:6px; padding:.1em .5em; color:var(--muted); }
+  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:.6em; align-items:stretch; }
+  .arch .n { background:var(--box); border:1px solid #2c3e4e; border-radius:8px; padding:.6em; }
+  .arch h3 { font-size:1em; margin:0 0 .3em 0; color:var(--accent); }
+  .arch ul { margin-left:1em; }
+  .arch li { margin:.15em 0; }
+  .pit li b { color: var(--accent2); }
+  .vid iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
+  .vid .cap { font-size:.55em; color:var(--muted); margin-top:.3em; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1. タイトル (0:30) -->
+<section class="center-slide">
+  <h1>Arivia</h1>
+  <h2>ArduPilot で動かす水上ドローンショー</h2>
+  <p class="sub">ArduPilot Developers Conference 2026 · Ottawa</p>
+  <p class="sub">[氏名 / 所属]</p>
+  <aside class="notes">0:30 — LED と噴水を載せた浮かぶドローンを Rover で動かしています。今日は、それが何か、どう横に動かしたか、学んだこと。</aside>
+</section>
+
+<!-- 2. Arivia とは (1:15) -->
+<section>
+  <h2>Arivia とは</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><span class="hl">スペースワン社</span>(日本)の自律型水上ドローン</li>
+        <li>LED + 噴水 + GPS 航行</li>
+        <li>複数台で同期ショー</li>
+        <li>CES Innovation Awards 2026 <span class="hl">Honoree</span>(Drones 部門)</li>
+        <li>ArduPilot Rover · Cube Orange · X フレームスラスタ</li>
+      </ul>
+    </div>
+    <div>
+      <div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/88uq0-AOGSM?rel=0" title="Arivia" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">Arivia ショーの概要</div></div>
+    </div>
+  </div>
+  <aside class="notes">1:15 — フローターと半円部に LED、頂上に噴水、下部のポンプで水を吸い上げる。仕様は公開情報の範囲で。</aside>
+</section>
+
+<!-- 3. システム構成 (1:00) -->
+<section>
+  <h2>システム構成</h2>
+  <div class="arch">
+    <div class="n"><h3>GCS</h3>
+      <ul><li>Raspberry Pi</li><li>ショーの実行</li><li>RTK 基準局 (F9P)</li></ul></div>
+    <div class="n"><h3>Unit(コンパニオン)</h3>
+      <ul><li>Raspberry Pi 4</li><li>LED・噴水・Web UI</li><li>MAVLink / RTCM 中継</li></ul></div>
+    <div class="n"><h3>FC</h3>
+      <ul><li>Cube Orange</li><li>ArduPilot Rover</li><li>移動のみ担当</li></ul></div>
+  </div>
+  <p style="margin-top:1em">ショー = <code>JSON</code> タイムライン: 位置・LED・噴水を 1 つの<span class="hl">タイムコード</span>で駆動</p>
+  <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
+  <aside class="notes">1:00 — FC は動かすだけ、ショーはコンパニオンが持つ。1 つのタイムコードで全てを駆動する。</aside>
+</section>
+
+<!-- 4. なぜ横移動か (1:15) -->
+<section>
+  <h2>なぜ横移動か</h2>
+  <ul>
+    <li>X フレームは全方向に並進できる</li>
+    <li>Rover は<span class="hl">「旋回してから進む」</span></li>
+    <li>ショーでは<span class="hl">機首を保ちたい</span>(LED の向き、噴水、客席)</li>
+    <li>目標: Guided/Auto の位置目標 + <span class="hl">固定ヘディング</span> + 横速度</li>
+  </ul>
+  <div class="cols"><div><div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/BAcNWhwhp2s?rel=0" title="Lateral sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">シミュレーション (Mission Planner)</div></div></div><div><div class="vid"><iframe data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">実機テスト</div></div></div></div>
+  <aside class="notes">1:15 — pivot して進むのは演出として不自然で、時間も無駄。</aside>
+</section>
+
+<!-- 5. 実装と落とし穴 (1:30) -->
+<section>
+  <h2>実装と落とし穴</h2>
+  <p class="sub">Rover-4.6.3 + 5 コミット · 16 ファイル · +661 / −69</p>
+  <div class="flow">
+    <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
+    <div class="n">mode_guided<br>mode_auto</div><span class="a">→</span>
+    <div class="n">AR_WPNav<br>固定ヘディング</div><span class="a">→</span>
+    <div class="n">AR_PosControl<br>前後 / 横に分解</div><span class="a">→</span>
+    <div class="n">AR_AttitudeControl<br>横 PID</div><span class="a">→</span>
+    <div class="n">Motors</div>
+  </div>
+  <ul class="pit">
+    <li><b>1.</b> <code>AR_PosControl::init</code> が固定ヘディングを消す → 横出力が止まる</li>
+    <li><b>2.</b> pivot turn が固定ヘディングと競合</li>
+    <li><b>3.</b> 横方向に cruise throttle の FF がない</li>
+  </ul>
+  <p class="sub">新規: <code>GUID_OPTIONS</code> bit 7 — Guided 位置目標で固定ヘディング</p>
+  <aside class="notes">1:30 — 図 1 枚 + 3 点。lateral_base が 0 固定で、抗力補償がなかった。</aside>
+</section>
+
+<!-- 6. 試験とログ解析 (1:15) -->
+<section>
+  <h2>試験とログ解析</h2>
+  <p>SITL → ベンチ → 水上</p>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>スラスタ動作中に <code>EKF3 ground mag anomaly</code></li>
+        <li>Yaw が<span class="hl">約 6 秒で 135° 以上</span>ジャンプ</li>
+        <li>モーター 1 本が約 60 秒飽和</li>
+        <li>原因は制御ではなく<span class="hl">コンパス干渉</span></li>
+        <li>安定化後は短距離の横移動が成功</li>
+      </ul>
+    </div>
+    <div>
+      <div class="ph">[ログのグラフ: YAW]<br>log_YAW.png</div>
+    </div>
+  </div>
+  <p class="sub">併せて判明: 横 PID のログ (PIDL) がない / <code>ATT.DesYaw</code> に固定ヘディングが出ない</p>
+  <aside class="notes">1:15 — 電気・磁気的な配置は制御器と同じくらい重要。未解決(チューニング、ログ)も言う。</aside>
+</section>
+
+<!-- 7. シミュレータ + RTK (1:00) -->
+<section>
+  <h2>ショーシミュレータと RTK の学び</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>SITL ×N + GCS + Unit を 1 台で起動</li>
+        <li>同じ JSON ショーをシミュレーションで実行</li>
+      </ul>
+      <div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">3D ドローンショーシミュレータ</div></div>
+    </div>
+    <div>
+      <p><span class="tag">RTK</span></p>
+      <ul>
+        <li>基準局 F9P が Survey-In でない → <span class="hl">RTCM 1005 が出ない</span> → RTK Fix しない</li>
+        <li>Tip: RTCM を覗いて 1005 を確認</li>
+        <li><code>GPS_INJECT_DATA</code> → <code>GPS_RTCM_DATA</code> に変更</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">1:00 — RTK は 1 行で。RTK Fixed にならないなら、1005 があるか確認。</aside>
+</section>
+
+<!-- 8. まとめ (0:45) -->
+<section>
+  <h2>まとめとお願い</h2>
+  <ul>
+    <li>Rover + オムニフレームで演出用の水上ショーが成立</li>
+    <li>横移動 = 固定ヘディング + 横 PID + オプション</li>
+    <li>学び: 状態リセット · pivot 判定 · FF · ログ</li>
+    <li>コード: ブランチ <code>rover-4.6.3-lateral-move</code> [URL]</li>
+    <li class="hl">Rover にオムニ / 横移動の需要はあるか? どう設計すべきか?</li>
+  </ul>
+  <p class="sub">[連絡先]</p>
+  <aside class="notes">0:45 — upstream PR の予定はない。マージの提案ではなく、共有と相談として。</aside>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true, slideNumber: 'c/t', width: 1280, height: 720,
+    transition: 'none', preloadIframes: false, plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>

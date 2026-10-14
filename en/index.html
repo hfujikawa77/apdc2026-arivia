@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Arivia: Water-Surface Drone Shows with ArduPilot</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/black.min.css">
+<style>
+  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; }
+  .reveal { font-size: 34px; }
+  .reveal h1, .reveal h2 { text-transform: none; letter-spacing: 0; }
+  .reveal h1 { font-size: 1.9em; }
+  .reveal h2 { font-size: 1.3em; color: var(--accent); margin-bottom: .6em; }
+  .reveal section { text-align: left; }
+  .reveal section.center-slide { text-align: center; }
+  .reveal ul { display: block; margin-left: 1em; }
+  .reveal li { margin: .35em 0; }
+  .sub { color: var(--muted); font-size: .7em; }
+  .hl { color: var(--accent2); }
+  code { color: var(--accent2); background: #1b2733; padding: 0 .25em; border-radius: 4px; font-size: .85em; }
+  .flow { display:flex; align-items:center; gap:.4em; flex-wrap:wrap; font-size:.6em; margin:.6em 0; }
+  .flow .n { background:var(--box); border:1px solid #2c3e4e; border-radius:8px; padding:.4em .6em; text-align:center; }
+  .flow .a { color:var(--muted); }
+  .cols { display:flex; gap:1em; }
+  .cols > div { flex:1; }
+  .ph { border:2px dashed #3a4a5a; border-radius:10px; color:var(--muted); font-size:.6em;
+        padding:1.6em 1em; text-align:center; background:#10171e; }
+  .tag { display:inline-block; font-size:.55em; background:#22313f; border-radius:6px; padding:.1em .5em; color:var(--muted); }
+  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:.6em; align-items:stretch; }
+  .arch .n { background:var(--box); border:1px solid #2c3e4e; border-radius:8px; padding:.6em; }
+  .arch h3 { font-size:1em; margin:0 0 .3em 0; color:var(--accent); text-transform:none; }
+  .arch ul { margin-left:1em; }
+  .arch li { margin:.15em 0; }
+  .pit li b { color: var(--accent2); }
+  .vid iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
+  .vid .cap { font-size:.55em; color:var(--muted); margin-top:.3em; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1. Title (0:30) -->
+<section class="center-slide">
+  <h1>Arivia</h1>
+  <h2>Water-Surface Drone Shows with ArduPilot</h2>
+  <p class="sub">ArduPilot Developers Conference 2026 · Ottawa</p>
+  <p class="sub">[Name / Affiliation]</p>
+  <aside class="notes">0:30 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
+</section>
+
+<!-- 2. What is Arivia (1:15) -->
+<section>
+  <h2>What is Arivia?</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>Autonomous water-surface drone by <span class="hl">Space One</span> (Japan)</li>
+        <li>LEDs + fountain + GPS navigation</li>
+        <li>Multiple units, synchronized shows</li>
+        <li>CES Innovation Awards 2026 <span class="hl">Honoree</span> (Drones)</li>
+        <li>ArduPilot Rover · Cube Orange · X-frame thrusters</li>
+      </ul>
+    </div>
+    <div>
+      <div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/88uq0-AOGSM?rel=0" title="Arivia" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">Arivia show overview</div></div>
+    </div>
+  </div>
+  <aside class="notes">1:15 — Floater and half-dome carry LEDs; fountain on top, a pump below draws water up. Keep to public specs.</aside>
+</section>
+
+<!-- 3. System architecture (1:00) -->
+<section>
+  <h2>System architecture</h2>
+  <div class="arch">
+    <div class="n"><h3>GCS</h3>
+      <ul><li>Raspberry Pi</li><li>Runs the show</li><li>RTK base (F9P)</li></ul></div>
+    <div class="n"><h3>Unit (companion)</h3>
+      <ul><li>Raspberry Pi 4</li><li>LED · fountain · web UI</li><li>Relays MAVLink / RTCM</li></ul></div>
+    <div class="n"><h3>FC</h3>
+      <ul><li>Cube Orange</li><li>ArduPilot Rover</li><li>Motion only</li></ul></div>
+  </div>
+  <p style="margin-top:1em">Show = <code>JSON</code> timeline: position, LED, fountain on one <span class="hl">timecode</span></p>
+  <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
+  <aside class="notes">1:00 — The FC only moves the boat; the companion owns the show. One timecode drives everything.</aside>
+</section>
+
+<!-- 4. Why lateral move (1:15) -->
+<section>
+  <h2>Why lateral move?</h2>
+  <ul>
+    <li>X-frame can translate in any direction</li>
+    <li>Rover navigates by <span class="hl">"turn, then drive"</span></li>
+    <li>Shows need the <span class="hl">heading held</span> (LED pattern, fountain, audience)</li>
+    <li>Goal: Guided/Auto position target + <span class="hl">fixed heading</span> + lateral velocity</li>
+  </ul>
+  <div class="cols"><div><div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/BAcNWhwhp2s?rel=0" title="Lateral sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">Simulation (Mission Planner)</div></div></div><div><div class="vid"><iframe data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">On-water test</div></div></div></div>
+  <aside class="notes">1:15 — Pivot-then-go looks wrong in choreography and wastes time.</aside>
+</section>
+
+<!-- 5. Implementation (1:30) -->
+<section>
+  <h2>Implementation &amp; pitfalls</h2>
+  <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69</p>
+  <div class="flow">
+    <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
+    <div class="n">mode_guided<br>mode_auto</div><span class="a">→</span>
+    <div class="n">AR_WPNav<br>fixed heading</div><span class="a">→</span>
+    <div class="n">AR_PosControl<br>fwd / lat split</div><span class="a">→</span>
+    <div class="n">AR_AttitudeControl<br>lateral PID</div><span class="a">→</span>
+    <div class="n">Motors</div>
+  </div>
+  <ul class="pit">
+    <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalls</li>
+    <li><b>2.</b> Pivot turn fights the fixed heading</li>
+    <li><b>3.</b> No cruise-throttle feed-forward on the lateral axis</li>
+  </ul>
+  <p class="sub">New: <code>GUID_OPTIONS</code> bit 7 — fixed heading for Guided position targets</p>
+  <aside class="notes">1:30 — One diagram, three bullets. Lateral base was hard-coded 0, so no drag compensation.</aside>
+</section>
+
+<!-- 6. Test & logs (1:15) -->
+<section>
+  <h2>Test &amp; log analysis</h2>
+  <p>SITL → bench → on water</p>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><code>EKF3 ground mag anomaly</code> while thrusters ran</li>
+        <li>Yaw jumped <span class="hl">&gt;135° in ~6 s</span></li>
+        <li>One motor saturated ~60 s</li>
+        <li>Root cause: <span class="hl">compass interference</span>, not the controller</li>
+        <li>After stabilizing: short lateral moves succeeded</li>
+      </ul>
+    </div>
+    <div>
+      <div class="ph">[LOG GRAPH: YAW]<br>log_YAW.png</div>
+    </div>
+  </div>
+  <p class="sub">Also found: no lateral PID log (PIDL); <code>ATT.DesYaw</code> ignores fixed heading</p>
+  <aside class="notes">1:15 — Electrical/magnetic layout matters as much as the controller. Say what is still open: tuning, logging.</aside>
+</section>
+
+<!-- 7. Simulator + RTK (1:00) -->
+<section>
+  <h2>Show simulator &amp; an RTK lesson</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>SITL ×N + GCS + Unit on one machine</li>
+        <li>Same JSON show runs in simulation</li>
+      </ul>
+      <div class="vid"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">3D show simulator</div></div>
+    </div>
+    <div>
+      <p><span class="tag">RTK</span></p>
+      <ul>
+        <li>Base F9P not in Survey-In → <span class="hl">no RTCM 1005</span> → no RTK Fix</li>
+        <li>Tip: sniff the RTCM stream and look for 1005</li>
+        <li>Moved <code>GPS_INJECT_DATA</code> → <code>GPS_RTCM_DATA</code></li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes">1:00 — RTK in one line: if you never reach RTK Fixed, check that message 1005 is present.</aside>
+</section>
+
+<!-- 8. Summary (0:45) -->
+<section>
+  <h2>Summary &amp; ask</h2>
+  <ul>
+    <li>Rover + omni frame works for choreographed water shows</li>
+    <li>Lateral move = fixed heading + lateral PID + options</li>
+    <li>Lessons: state resets · pivot logic · feed-forward · logging</li>
+    <li>Code: branch <code>rover-4.6.3-lateral-move</code> [URL]</li>
+    <li class="hl">Is there interest in omni / lateral support in Rover? How would you design it?</li>
+  </ul>
+  <p class="sub">[Contact]</p>
+  <aside class="notes">0:45 — No upstream PR is planned: frame this as sharing and asking, not proposing a merge.</aside>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true, slideNumber: 'c/t', width: 1280, height: 720,
+    transition: 'none', preloadIframes: false, plugins: [ RevealNotes ]
+  });
+</script>
+</body>
+</html>
