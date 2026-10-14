@@ -16,6 +16,9 @@
   .reveal h2 { font-size: 1.3em; color: var(--accent); margin-bottom: .6em; }
   .reveal section { text-align: left; }
   .reveal section.center-slide { text-align: center; }
+  /* top-aligned: every slide title sits at the same height */
+  .reveal .slides > section { padding-top: 24px; box-sizing: border-box; }
+  .reveal .slides > section.center-slide { padding-top: 150px; }
   .reveal ul { display: block; margin-left: 1em; }
   .reveal li { margin: .35em 0; }
   .sub { color: var(--muted); font-size: .7em; }
@@ -197,7 +200,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js"></script>
 <script>
   Reveal.initialize({
-    hash: true, slideNumber: 'c/t', width: 1280, height: 720,
+    hash: true, center: false, slideNumber: 'c/t', width: 1280, height: 720,
     transition: 'none', preloadIframes: false, plugins: [ RevealNotes ]
   });
 </script>
