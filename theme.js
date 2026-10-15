@@ -11,7 +11,7 @@
     if (name) localStorage.setItem(KEY, name);
     else name = localStorage.getItem(KEY);
   } catch (e) {}
-  if (!(name in THEMES)) name = 'dracula';
+  if (!(name in THEMES)) name = 'night';
   var link = document.getElementById('theme');
   if (link) link.href = link.href.replace(/theme\/[a-z]+\.min\.css/, 'theme/' + name + '.min.css');
   if (THEMES[name]) document.documentElement.classList.add('light');
