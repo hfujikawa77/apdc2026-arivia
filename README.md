@@ -6,4 +6,4 @@ Slides for "Arivia: Water-Surface Drone Shows with ArduPilot" (ArduPilot Develop
 - Japanese: `ja/index.html`
 
 Built with reveal.js (CDN). Serve over HTTP (e.g. `python3 -m http.server`) so the embedded YouTube videos play.
-- Themes: pick one on the top page, or add `?theme=dracula` (default) / `night` / `moon` / `sky` etc. to a slide URL; the choice is remembered in the browser.
+- Themes: pick one on the top page, or add `?theme=night` (default) / `dracula` / `moon` / `sky` etc. to a slide URL; the choice is remembered in the browser.
