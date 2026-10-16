@@ -185,7 +185,7 @@
   <ul class="big">
     <li><span class="hl">No lateral feed-forward</span> (<code>lateral_base = 0</code>)</li>
     <li><code>ATC_LAT_P/I</code> = 0.20, copied from forward</li>
-    <li>Shared <code>ATC_ACCEL_MAX</code> + short moves</li>
+    <li>Shared <code>ATC_ACCEL_MAX</code>: the target outruns the boat</li>
   </ul>
   <p class="sub">Logs: fixed heading is set correctly, but no PIDL log and <code>ATT.DesYaw</code> = 0 → tracking can't be seen</p>
   <aside class="notes">0:30 — We can't fully prove why because the lateral PID isn't logged. Next: add feed-forward, add the log, tune ATC_LAT_P/I.</aside>
