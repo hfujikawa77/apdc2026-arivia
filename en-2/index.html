@@ -106,7 +106,7 @@
   </div>
   <p style="margin-top:1em">Show = <code>JSON</code> timeline: position, LED, fountain on one <span class="hl">timecode</span></p>
   <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
-  <aside class="notes">1:00 — The FC only moves the boat; the companion owns the show. One timecode drives everything.</aside>
+  <aside class="notes">1:20 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Positioning story: in Japan QZSS CLAS (no base station) gave RTK Fixed; overseas we need our own RTK base (GCS relays RTCM); if RTK Fixed never comes, check RTCM message 1005.</aside>
 </section>
 
 <!-- 5. Why lateral move (0:45) -->
@@ -204,18 +204,7 @@
   <aside class="notes">0:40 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware, built with Claude Code. The same JSON show runs here, with several boats.</aside>
 </section>
 
-<!-- 14. Positioning (0:20) -->
-<section>
-  <h2>Positioning</h2>
-  <ul class="big">
-    <li>In Japan: <span class="hl">QZSS CLAS (no base station)</span> worked well (Status 6 ≈ 70%, HDOP ≈ 0.8)</li>
-    <li>Overseas demo → <span class="hl">RTK</span> needed (own base + RTCM)</li>
-    <li>Lesson: no RTCM 1005 → no Fix</li>
-  </ul>
-  <aside class="notes">0:20 — If you never reach RTK Fixed, check for message 1005. Drop this slide first if time is short.</aside>
-</section>
-
-<!-- 15. Summary (0:45) -->
+<!-- 14. Summary (0:45) -->
 <section>
   <h2>Summary &amp; ask</h2>
   <ul class="big">
