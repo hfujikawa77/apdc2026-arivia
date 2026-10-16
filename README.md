@@ -1,6 +1,6 @@
 # apdc2026-arivia
 
-Slides for "Arivia: Water-Surface Drone Shows with ArduPilot" (ArduPilot Developers Conference 2026, Ottawa).
+Slides for "Arivia: Water-Surface Drone Shows with ArduPilot" (ArduPilot DevConf 2026, Ottawa).
 
 - English: `en/index.html`
 - Japanese: `ja/index.html`
