@@ -8,7 +8,7 @@
 <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/night.min.css">
 <script src="../theme.js"></script>
 <style>
-  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; --line:#2c3e4e; --sunk:#1b2733; --ph-bg:#10171e; --ph-line:#3a4a5a; --chip:#22313f; }
+  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; --line:#2c3e4e; --sunk:#1b2733; --ph-bg:#10171e; --ph-line:#3a4a5a; --chip:#22313f; --fs-m:.82em; --fs-s:.71em; }
   :root.light { --accent:#0b6fa8; --accent2:#b85400; --muted:#566370; --box:#eef3f7; --line:#c3cfd9; --sunk:#e3eaf0; --ph-bg:#f3f6f9; --ph-line:#aab8c4; --chip:#dde5ec; }
   .reveal { font-size: 34px; }
   .reveal h1, .reveal h2 { text-transform: none; letter-spacing: 0; }
@@ -21,37 +21,45 @@
   .reveal .slides > section.center-slide { padding-top: 150px; }
   .reveal ul { display: block; margin-left: 1em; }
   .reveal li { margin: .35em 0; }
-  .sub { color: var(--muted); font-size: .7em; }
+  .reveal li, .reveal p { text-wrap: pretty; }
+  .sub { color: var(--muted); font-size: var(--fs-m); }
+  .sub.s { font-size: var(--fs-s); }
+  .center-slide .sub { font-size: .95em; }
   .hl { color: var(--accent2); }
   code { color: var(--accent2); background: var(--sunk); padding: 0 .25em; border-radius: 4px; font-size: .85em; }
-  .flow { display:flex; align-items:center; justify-content:center; gap:.4em; flex-wrap:wrap; font-size:.6em; margin:.6em 0; }
+  .flow { display:flex; align-items:center; justify-content:center; gap:.4em; flex-wrap:wrap; font-size:var(--fs-s); margin:.6em 0; }
   .flow .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.4em .6em; text-align:center; }
   .flow .a { color:var(--muted); }
   .cols { display:flex; gap:1em; }
   .cols > div { flex:1; }
   .ph { border:2px dashed var(--ph-line); border-radius:10px; color:var(--muted); font-size:.6em;
         padding:1.6em 1em; text-align:center; background:var(--ph-bg); }
-  .tag { display:inline-block; font-size:.55em; background:var(--chip); border-radius:6px; padding:.1em .5em; color:var(--muted); }
-  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:.6em; align-items:stretch; }
+  .tag { display:inline-block; font-size:var(--fs-s); background:var(--chip); border-radius:6px; padding:.1em .5em; color:var(--muted); }
+  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:var(--fs-m); align-items:stretch; }
   .arch .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.6em; }
   .arch h3 { font-size:1em; margin:0 0 .3em 0; color:var(--accent); text-transform:none; }
   .arch ul { margin-left:1em; }
   .arch li { margin:.15em 0; }
-  .reveal ul.sm { font-size:.75em; }
+  .reveal ul.sm { font-size:var(--fs-s); }
+  .reveal ul.sm.m { font-size:var(--fs-m); }
   .pit li b { color: var(--accent2); }
   .vid iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
-  .vid .cap { font-size:.55em; color:var(--muted); margin-top:.3em; }
-  .bars { font-size:.6em; margin:.4em 0 .6em; }
+  .vid .cap { font-size:var(--fs-s); color:var(--muted); margin-top:.3em; }
+  .bars { font-size:var(--fs-s); margin:.4em 0 .6em; }
   .bars .row { display:flex; align-items:center; gap:.6em; margin:.35em 0; }
   .bars .lbl { width:9em; color:var(--muted); }
   .bars .track { flex:1; background:var(--sunk); border-radius:4px; height:1.1em; position:relative; }
   .bars .fill { background:var(--accent); height:100%; border-radius:4px; }
   .bars .fill.lat { background:var(--accent2); }
   .bars .val { width:7em; text-align:right; }
-  .big li { font-size:1.1em; margin:.55em 0; }
+  .flow.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.7em; font-size:var(--fs-m); counter-reset:step; }
+  .flow.grid .a { display:none; }
+  .flow.grid .n { counter-increment:step; padding:.6em .8em; }
+  .flow.grid .n::before { content:counter(step) ". "; color:var(--accent2); font-weight:700; }
+  .big li { font-size:1.18em; margin:.55em 0; }
   .vid.wide { width:880px; margin:0 auto; }
   .vid.mid { width:760px; margin:0 auto; }
-  .vid.wide .cap, .vid.mid .cap { text-align:center; font-size:.6em; }
+  .vid.wide .cap, .vid.mid .cap { text-align:center; }
 </style>
 </head>
 <body>
@@ -125,7 +133,7 @@
 <section>
   <h2>Implementation</h2>
   <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69</p>
-  <div class="flow">
+  <div class="flow grid">
     <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
     <div class="n">mode_guided<br>mode_auto</div><span class="a">→</span>
     <div class="n">AR_WPNav<br>fixed heading</div><span class="a">→</span>
@@ -155,7 +163,7 @@
   <ul class="big">
     <li>Lateral is <span class="hl">slow</span>: peak speed (target 2.0 m/s)</li>
   </ul>
-  <div class="bars" style="font-size:.85em;margin-top:1em"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
+  <div class="bars" style="font-size:var(--fs-m);margin-top:1em"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
   <aside class="notes">0:45 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
 </section>
 
@@ -215,7 +223,7 @@
 <!-- 14. Summary (0:45) -->
 <section>
   <h2>Summary &amp; ask</h2>
-  <ul>
+  <ul class="big">
     <li>Rover + omni frame works for choreographed water shows</li>
     <li>Lateral move = fixed heading + lateral PID + options</li>
     <li>Lessons: state resets · pivot logic · feed-forward · logging</li>

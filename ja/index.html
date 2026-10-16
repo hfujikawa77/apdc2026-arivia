@@ -8,7 +8,7 @@
 <link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/night.min.css">
 <script src="../theme.js"></script>
 <style>
-  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; --line:#2c3e4e; --sunk:#1b2733; --ph-bg:#10171e; --ph-line:#3a4a5a; --chip:#22313f; }
+  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; --line:#2c3e4e; --sunk:#1b2733; --ph-bg:#10171e; --ph-line:#3a4a5a; --chip:#22313f; --fs-m:.82em; --fs-s:.71em; }
   :root.light { --accent:#0b6fa8; --accent2:#b85400; --muted:#566370; --box:#eef3f7; --line:#c3cfd9; --sunk:#e3eaf0; --ph-bg:#f3f6f9; --ph-line:#aab8c4; --chip:#dde5ec; }
   .reveal { font-size: 32px; font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif; }
   .reveal h1, .reveal h2, .reveal h3 { font-family: inherit; text-transform: none; letter-spacing: 0; }
@@ -21,27 +21,31 @@
   .reveal .slides > section.center-slide { padding-top: 150px; }
   .reveal ul { display: block; margin-left: 1em; }
   .reveal li { margin: .35em 0; }
-  .sub { color: var(--muted); font-size: .7em; }
+  .reveal li, .reveal p { text-wrap: pretty; }
+  .sub { color: var(--muted); font-size: var(--fs-m); }
+  .sub.s { font-size: var(--fs-s); }
+  .center-slide .sub { font-size: .95em; }
   .hl { color: var(--accent2); }
   code { color: var(--accent2); background: var(--sunk); padding: 0 .25em; border-radius: 4px; font-size: .85em; }
-  .flow { display:flex; align-items:center; justify-content:center; gap:.4em; flex-wrap:wrap; font-size:.6em; margin:.6em 0; }
+  .flow { display:flex; align-items:center; justify-content:center; gap:.4em; flex-wrap:wrap; font-size:var(--fs-s); margin:.6em 0; }
   .flow .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.4em .6em; text-align:center; }
   .flow .a { color:var(--muted); }
   .cols { display:flex; gap:1em; }
   .cols > div { flex:1; }
   .ph { border:2px dashed var(--ph-line); border-radius:10px; color:var(--muted); font-size:.6em;
         padding:1.6em 1em; text-align:center; background:var(--ph-bg); }
-  .tag { display:inline-block; font-size:.55em; background:var(--chip); border-radius:6px; padding:.1em .5em; color:var(--muted); }
-  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:.6em; align-items:stretch; }
+  .tag { display:inline-block; font-size:var(--fs-s); background:var(--chip); border-radius:6px; padding:.1em .5em; color:var(--muted); }
+  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:var(--fs-m); align-items:stretch; }
   .arch .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.6em; }
   .arch h3 { font-size:1em; margin:0 0 .3em 0; color:var(--accent); }
   .arch ul { margin-left:1em; }
   .arch li { margin:.15em 0; }
-  .reveal ul.sm { font-size:.75em; }
+  .reveal ul.sm { font-size:var(--fs-s); }
+  .reveal ul.sm.m { font-size:var(--fs-m); }
   .pit li b { color: var(--accent2); }
   .vid iframe { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
-  .vid .cap { font-size:.55em; color:var(--muted); margin-top:.3em; }
-  .bars { font-size:.6em; margin:.4em 0 .6em; }
+  .vid .cap { font-size:var(--fs-s); color:var(--muted); margin-top:.3em; }
+  .bars { font-size:var(--fs-s); margin:.4em 0 .6em; }
   .bars .row { display:flex; align-items:center; gap:.6em; margin:.35em 0; }
   .bars .lbl { width:9em; color:var(--muted); }
   .bars .track { flex:1; background:var(--sunk); border-radius:4px; height:1.1em; position:relative; }
@@ -143,16 +147,16 @@
   <h2>横移動は動いたか?</h2>
   <div class="cols">
     <div>
-      <p class="sub">Guided GoTo ×19・みちびき CLAS(基準局なし)</p>
+      <p class="sub s">Guided GoTo ×19・みちびき CLAS(基準局なし)</p>
       <ul>
-        <li>横は<span class="hl">遅い</span>: 最大速度(目標 2.0 m/s)</li>
+        <li>横は<span class="hl">遅い</span>: 最大速度</li>
       </ul>
       <div class="bars"><div class="row"><span class="lbl">横のみ</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">前進主体</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">目標</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
-      <ul class="sm">
-        <li><span class="hl">手前で止まる</span>: 「到達」が目標の 0.3〜1.8 m 手前で成立(<code>WP_RADIUS</code> = 2 m)し、横出力が切れる</li>
+      <ul class="sm m">
+        <li><span class="hl">手前で止まる</span>: 目標の 0.3〜1.8 m 手前で<span style="white-space:nowrap">「到達」</span>成立(<code>WP_RADIUS</code> = 2 m)、横出力が切れる</li>
       </ul>
-      <p class="sub">ショー(3 台): プログラムに追従。終端残差 0.30 / 1.18 / 0.40 m</p>
-      <p class="sub">ログ: 固定ヘディングは正しく設定。ただし PIDL なし・<code>ATT.DesYaw</code> = 0 → 追従が見えない</p>
+      <p class="sub s">ショー(3 台): プログラムに追従。終端残差 0.30 / 1.18 / 0.40 m</p>
+      <p class="sub s">ログ: 固定ヘディングは正しく設定。ただし PIDL なし・<code>ATT.DesYaw</code> = 0 → 追従が見えない</p>
     </div>
     <div>
       <div class="vid"><iframe data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe><div class="cap">実機テスト</div></div>
@@ -177,7 +181,7 @@
         <li><span class="hl">3D シミュレータ</span>を作成: SITL(<code>rover-omni3mecanum</code>)+ 横移動ファーム(Claude Code で開発)</li>
       </ul>
       <p><span class="tag">測位</span></p>
-      <ul class="sm">
+      <ul class="sm m">
         <li>国内: <span class="hl">みちびき CLAS(基準局なし)</span>で良好(Status 6 約 70%、HDOP 約 0.8)</li>
         <li>海外デモ → <span class="hl">RTK</span> が必要(自前の基準局 + RTCM)</li>
         <li>学び: RTCM 1005 が出ないと Fix しない</li>
