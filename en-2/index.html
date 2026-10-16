@@ -155,7 +155,14 @@
   <aside class="notes">0:45 — Lateral base was hard-coded 0, so no drag compensation.</aside>
 </section>
 
-<!-- 9. Did lateral move work? (0:45) -->
+<!-- 9. On-water test (0:30) -->
+<section>
+  <h2>On-water test</h2>
+  <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+  <aside class="notes">0:30 — Watch the boat: it is slow, and it stops short of the target. Three boats followed the lateral program; end residuals 0.30 / 1.18 / 0.40 m.</aside>
+</section>
+
+<!-- 10. Did lateral move work? (0:45) -->
 <section>
   <h2>Did lateral move work?</h2>
   <p class="sub">Guided GoTo ×19 · QZSS CLAS (no base station)</p>
@@ -166,7 +173,7 @@
   <aside class="notes">0:45 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
 </section>
 
-<!-- 9b. Stops short (0:30) -->
+<!-- 11. Stops short (0:30) -->
 <section>
   <h2>It also stops short</h2>
   <ul class="big">
@@ -177,14 +184,7 @@
   <aside class="notes">0:30 — WpDist is the real distance to the destination while navigating; after "reached" it measures the distance to the loiter point. So the earlier 22/22 reached did not mean the boat arrived. Next: test with a small WP_RADIUS.</aside>
 </section>
 
-<!-- 10. On-water test (0:30) -->
-<section>
-  <h2>On-water test</h2>
-  <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-  <aside class="notes">0:30 — Three boats followed the lateral program; end residuals 0.30 / 1.18 / 0.40 m.</aside>
-</section>
-
-<!-- 11. Why slow? (0:30) -->
+<!-- 12. Why slow? (0:30) -->
 <section>
   <h2>Why slow?</h2>
   <p><span class="tag">Likely causes — not verified yet</span></p>
@@ -197,14 +197,14 @@
   <aside class="notes">0:30 — We can't fully prove why because the lateral PID isn't logged. Next: add feed-forward, add the log, tune ATC_LAT_P/I.</aside>
 </section>
 
-<!-- 12. 3D show simulator (0:40) -->
+<!-- 13. 3D show simulator (0:40) -->
 <section>
   <h2>3D show simulator</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes">0:40 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware, built with Claude Code. The same JSON show runs here, with several boats.</aside>
 </section>
 
-<!-- 13. Positioning (0:20) -->
+<!-- 14. Positioning (0:20) -->
 <section>
   <h2>Positioning</h2>
   <ul class="big">
@@ -215,7 +215,7 @@
   <aside class="notes">0:20 — If you never reach RTK Fixed, check for message 1005. Drop this slide first if time is short.</aside>
 </section>
 
-<!-- 14. Summary (0:45) -->
+<!-- 15. Summary (0:45) -->
 <section>
   <h2>Summary &amp; ask</h2>
   <ul class="big">
