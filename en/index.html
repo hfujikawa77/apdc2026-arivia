@@ -143,12 +143,14 @@
   <h2>Did lateral move work?</h2>
   <div class="cols">
     <div>
-      <p class="sub">Guided GoTo ×22, positioning: QZSS CLAS (no base station)</p>
+      <p class="sub">Guided GoTo ×19 · QZSS CLAS (no base station)</p>
       <ul>
-        <li><span class="hl">22 / 22 reached</span> the target</li>
-        <li>But lateral is <span class="hl">slow</span> (target 2.0 m/s):</li>
+        <li>Lateral is <span class="hl">slow</span>: peak speed (target 2.0 m/s)</li>
       </ul>
-      <div class="bars"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:32.5%"></div></div><span class="val">0.22–0.31 m/s</span></div><div class="row"><span class="lbl">Mixed</span><div class="track"><div class="fill " style="width:65.0%"></div></div><span class="val">0.40–0.65 m/s</span></div><div class="row"><span class="lbl">Forward only</span><div class="track"><div class="fill " style="width:67.5%"></div></div><span class="val">0.54 m/s</span></div></div>
+      <div class="bars"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
+      <ul class="sm">
+        <li><span class="hl">Stops short</span>: "reached" fires 0.3–1.8 m before the target (<code>WP_RADIUS</code> = 2 m), then lateral drive is cut</li>
+      </ul>
       <p class="sub">Show (3 boats): followed the program; end residual 0.30 / 1.18 / 0.40 m</p>
       <p class="sub">Logs: fixed heading is set correctly, but no PIDL log and <code>ATT.DesYaw</code> = 0 → tracking can't be seen</p>
     </div>
@@ -162,7 +164,7 @@
       </ul>
     </div>
   </div>
-  <aside class="notes">1:15 — It moved, but slowly, and we can't fully prove why because the lateral PID isn't logged. Next: add feed-forward, add the log, tune ATC_LAT_P/I.</aside>
+  <aside class="notes">1:15 — It moved, but slowly (peak speed, EKF body frame), and it stopped short because "reached" fires inside WP_RADIUS = 2 m. We can't fully prove why it is slow because the lateral PID isn't logged. Next: add feed-forward, add the log, tune ATC_LAT_P/I, test with a small WP_RADIUS.</aside>
 </section>
 
 <!-- 7. Simulator + positioning (1:00) -->
