@@ -118,12 +118,12 @@
     <div class="n">AR_AttitudeControl<br>lateral PID</div><span class="a">→</span>
     <div class="n">Motors</div>
   </div>
-  <p class="sub">New: <code>GUID_OPTIONS</code> bit 7 — fixed heading for Guided position targets</p>
+  <p class="sub">Use: Auto = <code>DO_SET_YAW</code> · Guided = <code>GUID_OPTIONS</code> bit 7</p>
   <ul class="pit big tight">
     <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalled</li>
     <li><b>2.</b> Pivot turn fought the fixed heading</li>
   </ul>
-  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
+  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a DO_SET_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
 </section>
 <!-- 6. On-water test (0:30) -->
 <section>
