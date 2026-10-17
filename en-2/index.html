@@ -100,13 +100,13 @@
     <div class="n"><h3>GCS</h3>
       <ul><li>Raspberry Pi 4</li><li>Runs the show</li><li>RTK base (F9P)</li></ul></div>
     <div class="n"><h3>Unit (companion)</h3>
-      <ul><li>Raspberry Pi 4</li><li>LED · fountain · web UI</li><li>Relays MAVLink / RTCM</li></ul></div>
+      <ul><li>Raspberry Pi 4</li><li>LED · fountain · web UI</li><li>Relays MAVLink / RTCM</li><li>FW update · params</li></ul></div>
     <div class="n"><h3>FC</h3>
       <ul><li>Cube Orange</li><li>ArduPilot Rover</li><li>Motion only</li></ul></div>
   </div>
   <p style="margin-top:1em">Show = <code>JSON</code> timeline: position, LED, fountain on one <span class="hl">timecode</span></p>
   <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
-  <aside class="notes">1:30 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got firmware update and parameter read/write. Positioning story: in Japan QZSS CLAS (no base station) gave RTK Fixed; overseas we need our own RTK base (GCS relays RTCM); if RTK Fixed never comes, check RTCM message 1005.</aside>
+  <aside class="notes">1:30 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning story: in Japan QZSS CLAS (no base station) gave RTK Fixed; overseas we need our own RTK base (GCS relays RTCM); if RTK Fixed never comes, check RTCM message 1005.</aside>
 </section>
 
 <!-- 5. Why lateral move (0:45) -->
