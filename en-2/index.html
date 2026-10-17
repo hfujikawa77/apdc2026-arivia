@@ -14,6 +14,8 @@
   .reveal h1, .reveal h2 { text-transform: none; letter-spacing: 0; }
   .reveal h1 { font-size: 1.9em; }
   .reveal h2 { font-size: 1.3em; color: var(--accent); margin-bottom: .6em; }
+  /* event logo: top-right, beside the title row (bottom edge is taken by the videos) */
+  .evt-logo { position:absolute; top:12px; right:20px; height:80px; width:auto; z-index:5; pointer-events:none; }
   .reveal section { text-align: left; }
   .reveal section.center-slide { text-align: center; }
   /* top-aligned: every slide title sits at the same height */
@@ -64,6 +66,7 @@
 </head>
 <body>
 <div class="reveal"><div class="slides">
+<img class="evt-logo" src="devcon-logo.png" alt="ArduPilot DevCon 2026 Ottawa">
 
 <!-- 1. Title (0:35) -->
 <section class="center-slide">
