@@ -94,18 +94,24 @@
   <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
   <aside class="notes">1:00 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning (CLAS / RTK / 1005) is not told; Q&amp;A only.</aside>
 </section>
-<!-- 4. Why lateral move? (0:50) -->
+<!-- 4. Why lateral move? (0:35) -->
 <section>
   <h2>Why lateral move?</h2>
   <ul class="big">
     <li>X-frame can translate in any direction</li>
     <li>Rover navigates by <span class="hl">"turn, then drive"</span></li>
     <li>Shows need the <span class="hl">heading held</span></li>
-<li>Open since 2018: ArduPilot issue <a href="https://github.com/ArduPilot/ardupilot/issues/9352" target="_blank" rel="noopener"><span class="hl">#9352</span></a></li>
     <li>Goal: <span class="hl">fixed heading</span> + lateral velocity</li>
   </ul>
-  <aside class="notes">0:50 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity. Issue #9352 (rmackay9, open since 2018): point the vehicle in any direction while it proceeds to the waypoint in Auto or Guided. Manual and Acro already move laterally on omni frames; the new part is Auto and Guided with the heading held.</aside>
+  <aside class="notes">0:35 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity. Manual and Acro already move laterally on omni frames; the new part is Auto and Guided with the heading held.</aside>
 </section>
+<!-- 4b. Upstream issue #9352 (0:25) -->
+<section>
+  <h2>Open since 2018: ArduPilot issue <a href="https://github.com/ArduPilot/ardupilot/issues/9352" target="_blank" rel="noopener"><span class="hl">#9352</span></a></h2>
+  <div class="vid wide"><img src="issue-9352.jpg" alt="ArduPilot issue #9352: Rover: support do-set-yaw on vehicles that support lateral control" style="width:100%;border-radius:8px;display:block"></div>
+  <aside class="notes">0:25 — rmackay9 (ArduPilot Rover maintainer), open since 2018: point the vehicle in any direction while it proceeds to the waypoint in Auto or Guided. His steps: a lateral speed controller in AR_AttitudeControl, AR_WPNav outputting throttle and lateral, and the vehicle code passing it to the motors. This work follows that outline on Rover 4.6.3.</aside>
+</section>
+
 <!-- 5. Implementation & pitfalls (0:55) -->
 <section>
   <h2>Implementation &amp; pitfalls</h2>
