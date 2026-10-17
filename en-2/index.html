@@ -57,6 +57,7 @@
   .flow.grid .n { counter-increment:step; padding:.6em .8em; }
   .flow.grid .n::before { content:counter(step) ". "; color:var(--accent2); font-weight:700; }
   .big li { font-size:1.18em; margin:.55em 0; }
+  .big.tight li { margin:.35em 0; }
   .vid.wide { width:1040px; margin:0 auto; }
   .vid.wide .cap, .vid.mid .cap { text-align:center; }
 </style>
@@ -70,7 +71,7 @@
   <h2>Water-Surface Drone Shows with ArduPilot</h2>
   <p class="sub">ArduPilot DevConf 2026 · Ottawa</p>
   <p class="sub">Hideyuki Fujikawa · Drone Japan</p>
-  <aside class="notes">0:30 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
+  <aside class="notes">0:35 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
 </section>
 
 <!-- 2. What is Arivia (0:45) -->
@@ -83,7 +84,7 @@
     <li><a href="https://www.ces.tech/ces-innovation-awards/2026/arivia-water-surface-light-and-fountain-drone/" target="_blank">CES Innovation Awards 2026</a> <span class="hl">Honoree</span></li>
   </ul>
   <p class="sub">ArduPilot Rover · Cube Orange · X-frame thrusters</p>
-  <aside class="notes">0:45 — Keep to public specs.</aside>
+  <aside class="notes">0:35 — Keep to public specs.</aside>
 </section>
 
 <!-- 3. Arivia in action (0:30) -->
@@ -118,7 +119,7 @@
     <li>Shows need the <span class="hl">heading held</span></li>
     <li>Goal: <span class="hl">fixed heading</span> + lateral velocity</li>
   </ul>
-  <aside class="notes">0:45 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity.</aside>
+  <aside class="notes">0:35 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity.</aside>
 </section>
 
 <!-- 6. Lateral move in simulation (0:30) -->
@@ -131,7 +132,7 @@
 <!-- 7. Implementation (0:45) -->
 <section>
   <h2>Implementation</h2>
-  <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69</p>
+  <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with <span class="hl">Claude Code</span></p>
   <div class="flow grid">
     <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
     <div class="n">mode_guided<br>mode_auto</div><span class="a">→</span>
@@ -141,7 +142,7 @@
     <div class="n">Motors</div>
   </div>
   <p class="sub">New: <code>GUID_OPTIONS</code> bit 7 — fixed heading for Guided position targets</p>
-  <aside class="notes">0:45 — One diagram. Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors.</aside>
+  <aside class="notes">1:00 — One diagram. Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors.</aside>
 </section>
 
 <!-- 8. Pitfalls (0:45) -->
@@ -152,7 +153,7 @@
     <li><b>2.</b> Pivot turn fights the fixed heading</li>
     <li><b>3.</b> No cruise-throttle feed-forward on the lateral axis</li>
   </ul>
-  <aside class="notes">0:45 — Lateral base was hard-coded 0, so no drag compensation.</aside>
+  <aside class="notes">0:30 — Lateral base was hard-coded 0, so no drag compensation.</aside>
 </section>
 
 <!-- 9. On-water test (0:30) -->
@@ -170,7 +171,7 @@
     <li>Peak speed: lateral <span class="hl">≈ 0.3</span>, forward ≈ 0.55 m/s</li>
   </ul>
   <div class="bars" style="font-size:1.05em;margin-top:1.2em"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
-  <aside class="notes">0:45 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
+  <aside class="notes">0:50 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
 </section>
 
 <!-- 11. Stops short (0:30) -->
@@ -207,15 +208,16 @@
 <!-- 14. Summary (0:45) -->
 <section>
   <h2>Summary &amp; ask</h2>
-  <ul class="big">
+  <ul class="big tight">
     <li>Rover + omni frame works for choreographed water shows</li>
     <li>Lateral move = fixed heading + lateral PID + options</li>
     <li>Lessons: state resets · pivot logic · feed-forward · logging</li>
+    <li>App developer + <span class="hl">Claude Code</span> = custom firmware, boat-tested</li>
     <li>Code: branch <code>rover-4.6.3-lateral-move</code> <br><a href="https://github.com/hfujikawa77/ardupilot/tree/rover-4.6.3-lateral-move" target="_blank" rel="noopener">github.com/hfujikawa77/ardupilot</a></li>
     <li class="hl">Is there interest in omni / lateral support in Rover? How would you design it?</li>
   </ul>
   <p class="sub">Contact: <a href="mailto:hfujikawa77@gmail.com">hfujikawa77@gmail.com</a></p>
-  <aside class="notes">0:45 — No upstream PR is planned: frame this as sharing and asking, not proposing a merge.</aside>
+  <aside class="notes">0:55 — No upstream PR is planned: frame this as sharing and asking, not proposing a merge.</aside>
 </section>
 
 </div></div>
