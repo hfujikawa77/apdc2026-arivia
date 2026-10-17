@@ -65,7 +65,7 @@
 <body>
 <div class="reveal"><div class="slides">
 
-<!-- 1. Title (0:30) -->
+<!-- 1. Title (0:35) -->
 <section class="center-slide">
   <h1>Arivia</h1>
   <h2>Water-Surface Drone Shows with ArduPilot</h2>
@@ -73,28 +73,13 @@
   <p class="sub">Hideyuki Fujikawa · Drone Japan</p>
   <aside class="notes">0:35 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
 </section>
-
-<!-- 2. What is Arivia (0:45) -->
+<!-- 2. What is Arivia? (0:40) -->
 <section>
   <h2>What is Arivia?</h2>
-  <ul class="big">
-    <li>Autonomous water-surface drone by <a href="https://spacexone.com/" target="_blank"><span class="hl">Space One</span></a> (Japan)</li>
-    <li>LEDs + fountain + GPS navigation</li>
-    <li>Multiple units, synchronized shows</li>
-    <li><a href="https://www.ces.tech/ces-innovation-awards/2026/arivia-water-surface-light-and-fountain-drone/" target="_blank">CES Innovation Awards 2026</a> <span class="hl">Honoree</span></li>
-  </ul>
-  <p class="sub">ArduPilot Rover · Cube Orange · X-frame thrusters</p>
-  <aside class="notes">0:35 — Keep to public specs.</aside>
-</section>
-
-<!-- 3. Arivia in action (0:30) -->
-<section>
-  <h2>Arivia in action</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/88uq0-AOGSM?rel=0" title="Arivia" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-  <aside class="notes">0:30 — Floater and half-dome carry LEDs; fountain on top, a pump below draws water up.</aside>
+  <aside class="notes">0:40 — Space One (Japan), CES Innovation Awards 2026 Honoree, ArduPilot Rover on a Cube Orange with X-frame thrusters. LEDs on the floater and half-dome, fountain on top, a pump underneath draws the water up. Keep to public specs. Links: https://spacexone.com/ · https://www.ces.tech/ces-innovation-awards/2026/arivia-water-surface-light-and-fountain-drone/</aside>
 </section>
-
-<!-- 4. System architecture (1:00) -->
+<!-- 3. System architecture (1:00) -->
 <section>
   <h2>System architecture</h2>
   <div class="arch">
@@ -107,10 +92,9 @@
   </div>
   <p style="margin-top:1em">Show = <code>JSON</code> timeline: position, LED, fountain on one <span class="hl">timecode</span></p>
   <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
-  <aside class="notes">1:30 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning story: in Japan QZSS CLAS (no base station) gave RTK Fixed; overseas we need our own RTK base (GCS relays RTCM); if RTK Fixed never comes, check RTCM message 1005.</aside>
+  <aside class="notes">1:00 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning (CLAS / RTK / 1005) is not told; Q&amp;A only.</aside>
 </section>
-
-<!-- 5. Why lateral move (0:45) -->
+<!-- 4. Why lateral move? (0:35) -->
 <section>
   <h2>Why lateral move?</h2>
   <ul class="big">
@@ -121,17 +105,9 @@
   </ul>
   <aside class="notes">0:35 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity.</aside>
 </section>
-
-<!-- 6. Lateral move in simulation (0:30) -->
+<!-- 5. Implementation & pitfalls (0:55) -->
 <section>
-  <h2>Lateral move in simulation</h2>
-  <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/BAcNWhwhp2s?rel=0" title="Lateral sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-  <aside class="notes">0:30 — Watch the bow, not the hull.</aside>
-</section>
-
-<!-- 7. Implementation (0:45) -->
-<section>
-  <h2>Implementation</h2>
+  <h2>Implementation &amp; pitfalls</h2>
   <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with <span class="hl">Claude Code</span></p>
   <div class="flow grid">
     <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
@@ -142,28 +118,19 @@
     <div class="n">Motors</div>
   </div>
   <p class="sub">New: <code>GUID_OPTIONS</code> bit 7 — fixed heading for Guided position targets</p>
-  <aside class="notes">1:00 — One diagram. Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors.</aside>
-</section>
-
-<!-- 8. Pitfalls (0:45) -->
-<section>
-  <h2>Three pitfalls</h2>
-  <ul class="pit big">
-    <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalls</li>
-    <li><b>2.</b> Pivot turn fights the fixed heading</li>
-    <li><b>3.</b> No cruise-throttle feed-forward on the lateral axis</li>
+  <ul class="pit big tight">
+    <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalled</li>
+    <li><b>2.</b> Pivot turn fought the fixed heading</li>
   </ul>
-  <aside class="notes">0:30 — Lateral base was hard-coded 0, so no drag compensation.</aside>
+  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. Claude Code read the Rover code and wrote the changes; we checked them on the real boat. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
 </section>
-
-<!-- 9. On-water test (0:30) -->
+<!-- 6. On-water test (0:30) -->
 <section>
   <h2>On-water test: slow, and short of the target</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes">0:30 — Watch the boat: it is slow, and it stops short of the target. Three boats followed the lateral program; end residuals 0.30 / 1.18 / 0.40 m.</aside>
 </section>
-
-<!-- 10. It is slow (0:45) -->
+<!-- 7. It is slow (0:40) -->
 <section>
   <h2>It is slow</h2>
   <p class="sub">Guided GoTo ×19 · QZSS CLAS (no base station)</p>
@@ -171,10 +138,9 @@
     <li>Peak speed: lateral <span class="hl">≈ 0.3</span>, forward ≈ 0.55 m/s</li>
   </ul>
   <div class="bars" style="font-size:1.05em;margin-top:1.2em"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
-  <aside class="notes">0:50 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
+  <aside class="notes">0:40 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
 </section>
-
-<!-- 11. Stops short (0:30) -->
+<!-- 8. Stops short (0:30) -->
 <section>
   <h2>It also stops short</h2>
   <ul class="big">
@@ -184,28 +150,23 @@
   </ul>
   <aside class="notes">0:30 — WpDist is the real distance to the destination while navigating; after "reached" it measures the distance to the loiter point. So the earlier 22/22 reached did not mean the boat arrived. Next: test with a small WP_RADIUS.</aside>
 </section>
-
-<!-- 12. Why slow? (0:30) -->
+<!-- 9. Why slow? (0:25) -->
 <section>
   <h2>Why slow?</h2>
-  <p><span class="tag">Likely causes — not verified yet</span></p>
+  <p><span class="tag">Likely cause — not verified yet</span></p>
   <ul class="big">
     <li><span class="hl">No lateral feed-forward</span> (<code>lateral_base = 0</code>)</li>
-    <li><code>ATC_LAT_P/I</code> = 0.20, copied from forward</li>
-    <li>Shared <code>ATC_ACCEL_MAX</code>: the target outruns the boat</li>
   </ul>
   <p class="sub">Logs: fixed heading is set correctly, but no PIDL log and <code>ATT.DesYaw</code> = 0 → tracking can't be seen</p>
-  <aside class="notes">0:30 — We can't fully prove why because the lateral PID isn't logged. Next: add feed-forward, add the log, tune ATC_LAT_P/I.</aside>
+  <aside class="notes">0:25 — We can't prove it, because the lateral PID is not logged. Top suspect: no cruise-throttle feed-forward on the lateral axis. Other suspects (ATC_LAT_P/I, shared ATC_ACCEL_MAX) are Q&amp;A only. Next: add the PIDL log, retest with a small WP_RADIUS, then tune.</aside>
 </section>
-
-<!-- 13. 3D show simulator (0:40) -->
+<!-- 10. 3D show simulator (0:35) -->
 <section>
   <h2>3D show simulator</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-  <aside class="notes">0:40 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware, built with Claude Code. The same JSON show runs here, with several boats.</aside>
+  <aside class="notes">0:35 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware, built with Claude Code. The same JSON show runs here, with several boats.</aside>
 </section>
-
-<!-- 14. Summary (0:45) -->
+<!-- 11. Summary (0:55) -->
 <section>
   <h2>Summary &amp; ask</h2>
     <ul class="big">
