@@ -94,16 +94,17 @@
   <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
   <aside class="notes">1:00 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning (CLAS / RTK / 1005) is not told; Q&amp;A only.</aside>
 </section>
-<!-- 4. Why lateral move? (0:35) -->
+<!-- 4. Why lateral move? (0:50) -->
 <section>
   <h2>Why lateral move?</h2>
   <ul class="big">
     <li>X-frame can translate in any direction</li>
     <li>Rover navigates by <span class="hl">"turn, then drive"</span></li>
     <li>Shows need the <span class="hl">heading held</span></li>
+<li>Open since 2018: ArduPilot issue <a href="https://github.com/ArduPilot/ardupilot/issues/9352" target="_blank" rel="noopener"><span class="hl">#9352</span></a></li>
     <li>Goal: <span class="hl">fixed heading</span> + lateral velocity</li>
   </ul>
-  <aside class="notes">0:35 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity.</aside>
+  <aside class="notes">0:50 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity. Issue #9352 (rmackay9, open since 2018): point the vehicle in any direction while it proceeds to the waypoint in Auto or Guided. Manual and Acro already move laterally on omni frames; the new part is Auto and Guided with the heading held.</aside>
 </section>
 <!-- 5. Implementation & pitfalls (0:55) -->
 <section>
