@@ -108,7 +108,7 @@
 <!-- 5. Implementation & pitfalls (0:55) -->
 <section>
   <h2>Implementation &amp; pitfalls</h2>
-  <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with <span class="hl">Claude Code</span></p>
+  <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with AI support</p>
   <div class="flow grid">
     <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
     <div class="n">mode_guided<br>mode_auto</div><span class="a">→</span>
@@ -122,7 +122,7 @@
     <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalled</li>
     <li><b>2.</b> Pivot turn fought the fixed heading</li>
   </ul>
-  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. Claude Code read the Rover code and wrote the changes; we checked them on the real boat. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
+  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
 </section>
 <!-- 6. On-water test (0:30) -->
 <section>
@@ -164,7 +164,7 @@
 <section>
   <h2>3D show simulator</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-  <aside class="notes">0:35 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware, built with Claude Code. The same JSON show runs here, with several boats.</aside>
+  <aside class="notes">0:35 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware. The same JSON show runs here, with several boats.</aside>
 </section>
 <!-- 11. Summary (0:55) -->
 <section>
@@ -172,7 +172,6 @@
     <ul class="big">
     <li>Rover + omni frame works for water shows</li>
     <li>Lateral move = fixed heading + lateral PID</li>
-    <li>App developer + <span class="hl">Claude Code</span> = custom firmware, boat-tested</li>
     <li class="hl">Interest in omni / lateral support in Rover? How would you design it?</li>
   </ul>
   <p class="sub">Code: <a href="https://github.com/hfujikawa77/ardupilot/tree/rover-4.6.3-lateral-move" target="_blank" rel="noopener"><code>rover-4.6.3-lateral-move</code></a> · github.com/hfujikawa77/ardupilot</p>
