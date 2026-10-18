@@ -112,7 +112,7 @@
   <aside class="notes">0:20 — Same idea as the previous slide. I asked Randy Mackay about this directly, and he pointed me to #9352 (open since 2018). We followed his outline on Rover 4.6.3. Details only if asked: lateral speed controller in AR_AttitudeControl, AR_WPNav output, vehicle code to motors; Manual and Acro already move sideways on omni frames, Auto and Guided with the heading held were missing.</aside>
 </section>
 
-<!-- 5. Implementation & pitfalls (0:55) -->
+<!-- 5. Implementation & pitfalls (1:05) -->
 <section>
   <h2>Implementation &amp; pitfalls</h2>
   <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with AI support</p>
@@ -129,7 +129,7 @@
     <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalled</li>
     <li><b>2.</b> Pivot turn fought the fixed heading</li>
   </ul>
-  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a CONDITION_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
+  <aside class="notes">1:05 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a CONDITION_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
 </section>
 <!-- 6. On-water test (0:35) -->
 <section>
