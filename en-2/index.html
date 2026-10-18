@@ -65,13 +65,13 @@
 <body>
 <div class="reveal"><div class="slides">
 
-<!-- 1. Title (0:35) -->
+<!-- 1. Title (0:30) -->
 <section class="center-slide">
   <h1>Arivia</h1>
   <h2>Water-Surface Drone Shows with ArduPilot</h2>
   <p class="sub">ArduPilot DevConf 2026 · Ottawa</p>
   <p class="sub">Hideyuki Fujikawa · Drone Japan</p>
-  <aside class="notes">0:35 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
+  <aside class="notes">0:30 — A floating drone with LEDs and a fountain, running Rover. Today: what it is, how we made it move sideways, and what we learned.</aside>
 </section>
 <!-- 2. What is Arivia? (0:40) -->
 <section>
@@ -79,7 +79,7 @@
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/88uq0-AOGSM?rel=0" title="Arivia" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes">0:40 — Space One (Japan), CES Innovation Awards 2026 Honoree. I joined to work on the ArduPilot side. ArduPilot Rover on a Cube Orange with X-frame thrusters. LEDs on the floater and half-dome, fountain on top, a pump underneath draws the water up. Keep to public specs. Links: https://spacexone.com/ · https://www.ces.tech/ces-innovation-awards/2026/arivia-water-surface-light-and-fountain-drone/</aside>
 </section>
-<!-- 3. System architecture (1:00) -->
+<!-- 3. System architecture (0:55) -->
 <section>
   <h2>System architecture</h2>
   <div class="arch">
@@ -92,9 +92,9 @@
   </div>
   <p style="margin-top:1em">Show = <code>JSON</code> timeline: position, LED, fountain on one <span class="hl">timecode</span></p>
   <p class="sub">GCS ⇄ (Wi-Fi / MAVLink) ⇄ Unit ⇄ FC</p>
-  <aside class="notes">1:00 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning (CLAS / RTK / 1005) is not told; Q&amp;A only.</aside>
+  <aside class="notes">0:55 — The FC only moves the boat; the companion owns the show. One timecode drives everything. Web UI story: the FC is in a waterproof case that is hard to open, so the unit web UI got custom-firmware update and a way to set GUID_OPTIONS (lateral move on). Positioning (CLAS / RTK / 1005) is not told; Q&amp;A only.</aside>
 </section>
-<!-- 4. Why lateral move? (0:35) -->
+<!-- 4. Why lateral move? (0:30) -->
 <section>
   <h2>Why lateral move?</h2>
   <ul class="big">
@@ -103,16 +103,16 @@
     <li>Shows need the <span class="hl">heading held</span></li>
     <li>Goal: <span class="hl">fixed heading</span> + lateral velocity</li>
   </ul>
-  <aside class="notes">0:35 — Pivot-then-go looks wrong in choreography and wastes time. LED pattern, fountain and audience direction all depend on heading. Goal: Guided/Auto position target + fixed heading + lateral velocity. Manual and Acro already move laterally on omni frames; the new part is Auto and Guided with the heading held.</aside>
+  <aside class="notes">0:30 — Role: why it is needed. Pivot-then-go looks wrong in choreography. LED pattern, fountain and audience direction depend on heading. Keywords: fixed heading, lateral velocity. The issue and existing features come on the next slide.</aside>
 </section>
-<!-- 4b. Upstream issue #9352 (0:15) -->
+<!-- 4b. Upstream issue #9352 (0:20) -->
 <section>
   <h2>Open since 2018: ArduPilot issue <a href="https://github.com/ArduPilot/ardupilot/issues/9352" target="_blank" rel="noopener"><span class="hl">#9352</span></a></h2>
   <div class="vid wide"><img src="issue-9352.jpg" alt="ArduPilot issue #9352: Rover: support do-set-yaw on vehicles that support lateral control" style="width:100%;border-radius:8px;display:block"></div>
-  <aside class="notes">0:15 — Same request as the previous slide, now from the Rover maintainer (rmackay9), open since 2018. Keep it short. Details only if asked: lateral speed controller in AR_AttitudeControl, AR_WPNav output, vehicle code to motors; this work follows that outline on Rover 4.6.3.</aside>
+  <aside class="notes">0:20 — Role: a known, long-standing request (not a new idea). Randy Mackay opened #9352 in 2018. Manual and Acro already move sideways on omni frames; Auto and Guided with the heading held are what was missing. Details only if asked: lateral speed controller in AR_AttitudeControl, AR_WPNav output, vehicle code to motors.</aside>
 </section>
 
-<!-- 5. Implementation & pitfalls (0:55) -->
+<!-- 5. Implementation & pitfalls (0:50) -->
 <section>
   <h2>Implementation &amp; pitfalls</h2>
   <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with AI support</p>
@@ -129,13 +129,13 @@
     <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalled</li>
     <li><b>2.</b> Pivot turn fought the fixed heading</li>
   </ul>
-  <aside class="notes">0:55 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a DO_SET_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
+  <aside class="notes">0:50 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a DO_SET_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
 </section>
-<!-- 6. On-water test (0:30) -->
+<!-- 6. On-water test (0:35) -->
 <section>
   <h2>On-water test: slow, and short of the target</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-  <aside class="notes">0:30 — Watch the boat, compared with forward moves: sideways it is about half as fast, and it tends to stop short of the target. Three boats followed the lateral program; end residuals 0.30 / 1.18 / 0.40 m.</aside>
+  <aside class="notes">0:35 — Role: observation, no numbers. Watch the sideways movement: compared with moving forward it is slower, and it tends to stop short of the target. Three boats followed the lateral program; end residuals 0.30 / 1.18 / 0.40 m. Do not describe video details beyond this.</aside>
 </section>
 <!-- 7. It is slow (0:40) -->
 <section>
@@ -145,7 +145,7 @@
     <li>Peak speed: lateral <span class="hl">≈ 0.3</span>, forward ≈ 0.55 m/s</li>
   </ul>
   <div class="bars" style="font-size:1.05em;margin-top:1.2em"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
-  <aside class="notes">0:40 — It moved, but slowly. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward.</aside>
+  <aside class="notes">0:40 — Role: measurement. The flight logs confirm what we saw. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward, so about half. "About half" is first said here.</aside>
 </section>
 <!-- 8. Stops short (0:30) -->
 <section>
@@ -155,9 +155,9 @@
     <li>Reason: <code>WP_RADIUS</code> = 2 m</li>
     <li>Then lateral drive is cut and the boat switches to loiter</li>
   </ul>
-  <aside class="notes">0:30 — WpDist is the real distance to the destination while navigating; after "reached" it measures the distance to the loiter point. So the earlier 22/22 reached did not mean the boat arrived. Next: test with a small WP_RADIUS.</aside>
+  <aside class="notes">0:30 — Role: measurement + confirmed cause. "Reached" fires 0.3 to 1.8 m before the target because WP_RADIUS was 2 m; then lateral drive is cut, the fixed heading is cleared, loiter starts. WpDist after "reached" measures the distance to the loiter point, so the earlier 22/22 reached did not mean the boat arrived. Next: test with a small WP_RADIUS.</aside>
 </section>
-<!-- 9. Why slow? (0:25) -->
+<!-- 9. Why slow? (0:35) -->
 <section>
   <h2>Why slow?</h2>
   <p><span class="tag">Likely cause — not verified yet</span></p>
@@ -165,7 +165,7 @@
     <li><span class="hl">No lateral feed-forward</span> (<code>lateral_base = 0</code>)</li>
   </ul>
   <p class="sub">Logs: fixed heading is set correctly, but no PIDL log and <code>ATT.DesYaw</code> = 0 → tracking can't be seen</p>
-  <aside class="notes">0:25 — We can't prove it, because the lateral PID is not logged. Top suspect: no cruise-throttle feed-forward on the lateral axis. Other suspects (ATC_LAT_P/I, shared ATC_ACCEL_MAX) are Q&amp;A only. Next: add the PIDL log, retest with a small WP_RADIUS, then tune.</aside>
+  <aside class="notes">0:35 — Role: analysis. We don't know yet; we can't prove it because the lateral PID is not logged. Top suspect: no cruise-throttle feed-forward on the lateral axis (forward has it). Unverified. Other suspects (ATC_LAT_P/I, shared ATC_ACCEL_MAX) are Q&amp;A only. Next: add the PIDL log, retest with a small WP_RADIUS, then tune.</aside>
 </section>
 <!-- 10. 3D show simulator (0:35) -->
 <section>
@@ -173,17 +173,17 @@
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes">0:35 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware. The same JSON show runs here, with several boats.</aside>
 </section>
-<!-- 11. Summary (0:55) -->
+<!-- 11. Summary (0:50) -->
 <section>
   <h2>Summary &amp; ask</h2>
     <ul class="big">
-    <li>Rover + omni frame works for water shows</li>
-    <li>Lateral move = fixed heading + lateral PID</li>
-    <li class="hl">Interest in omni / lateral support in Rover? How would you design it?</li>
+    <li>Fixed-heading lateral move works on a real boat</li>
+    <li>Still open: <span class="hl">speed</span> and <span class="hl">arrival position</span></li>
+    <li class="hl">Native lateral support in Rover: useful? How would you design it?</li>
   </ul>
   <p class="sub">Code: <a href="https://github.com/hfujikawa77/ardupilot/tree/rover-4.6.3-lateral-move" target="_blank" rel="noopener"><code>rover-4.6.3-lateral-move</code></a> · github.com/hfujikawa77/ardupilot</p>
   <p class="sub">Contact: <a href="mailto:hfujikawa77@gmail.com">hfujikawa77@gmail.com</a></p>
-  <aside class="notes">0:55 — No upstream PR is planned: frame this as sharing and asking, not proposing a merge.</aside>
+  <aside class="notes">0:50 — Role: result and open items, then the ask. Worked: fixed-heading lateral move on a real boat. Open: speed and positioning. Leave a pause after each question. No upstream PR is planned: frame this as sharing and asking, not proposing a merge.</aside>
 </section>
 
 </div></div>
