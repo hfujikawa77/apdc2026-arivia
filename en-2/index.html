@@ -165,7 +165,10 @@
     <li><span class="hl">No lateral feed-forward</span> (<code>lateral_base = 0</code>)</li>
   </ul>
   <p class="sub">Logs: fixed heading is set correctly, but no PIDL log and <code>ATT.DesYaw</code> = 0 → tracking can't be seen</p>
-  <aside class="notes">0:35 — Role: analysis. We don't know yet; we can't prove it because the lateral PID is not logged. Top suspect: no cruise-throttle feed-forward on the lateral axis (forward has it). Unverified. Other suspects (ATC_LAT_P/I, shared ATC_ACCEL_MAX) are Q&amp;A only. Next: add the PIDL log, retest with a small WP_RADIUS, then tune.</aside>
+  <ul class="big">
+    <li>Next: <span class="hl">lateral PID log</span> · retest with a smaller <code>WP_RADIUS</code> · tune</li>
+  </ul>
+  <aside class="notes">0:35 — Role: analysis. We don't know yet; we can't prove it because the lateral PID is not logged. Top suspect: no cruise-throttle feed-forward on the lateral axis (forward has it). Unverified. Other suspects (ATC_LAT_P/I, shared ATC_ACCEL_MAX) are Q&amp;A only. Next (also on the slide): add the PIDL log, retest with a small WP_RADIUS, then tune.</aside>
 </section>
 <!-- 10. 3D show simulator (0:35) -->
 <section>
