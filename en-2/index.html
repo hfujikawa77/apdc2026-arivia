@@ -206,6 +206,13 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
     hash: true, center: false, slideNumber: 'c/t', width: 1280, height: 720,
     transition: 'none', preloadIframes: false, plugins: [ RevealNotes ]
   });
+  // keep presenter.html (script-first presenter page) in sync with this window
+  try {
+    const bc = new BroadcastChannel('arivia-en2');
+    Reveal.on('ready', e => bc.postMessage({ t: 'slide', h: e.indexh }));
+    Reveal.on('slidechanged', e => bc.postMessage({ t: 'slide', h: e.indexh }));
+    bc.onmessage = m => { if (m.data && m.data.t === 'goto') Reveal.slide(m.data.h, 0); };
+  } catch (e) {}
 </script>
 </body>
 </html>
