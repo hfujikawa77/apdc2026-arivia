@@ -105,16 +105,16 @@
   </ul>
   <aside class="notes">0:30 — Role: why it is needed. Pivot-then-go looks wrong in choreography. LED pattern, fountain and audience direction depend on heading. Keywords: fixed heading, lateral velocity. The issue and existing features come on the next slide.</aside>
 </section>
-<!-- 4b. Upstream issue #9352 (0:20) -->
+<!-- 5. Upstream issue #9352 (0:20) -->
 <section>
   <h2>Open since 2018: ArduPilot issue <a href="https://github.com/ArduPilot/ardupilot/issues/9352" target="_blank" rel="noopener"><span class="hl">#9352</span></a></h2>
   <div class="vid wide"><img src="issue-9352.jpg" alt="ArduPilot issue #9352: Rover: support do-set-yaw on vehicles that support lateral control" style="width:100%;border-radius:8px;display:block"></div>
   <aside class="notes">0:20 — Same idea as the previous slide. I asked Randy Mackay about this directly, and he pointed me to #9352 (open since 2018). We followed his outline on Rover 4.6.3. Details only if asked: lateral speed controller in AR_AttitudeControl, AR_WPNav output, vehicle code to motors; Manual and Acro already move sideways on omni frames, Auto and Guided with the heading held were missing.</aside>
 </section>
 
-<!-- 5. Implementation & pitfalls (1:05) -->
+<!-- 6. Implementation (0:50) -->
 <section>
-  <h2>Implementation &amp; pitfalls</h2>
+  <h2>Implementation</h2>
   <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with AI support</p>
   <div class="flow grid">
     <div class="n">MAVLink /<br>Mission</div><span class="a">→</span>
@@ -124,20 +124,27 @@
     <div class="n">AR_AttitudeControl<br>lateral PID</div><span class="a">→</span>
     <div class="n">Motors</div>
   </div>
-  <p class="sub">Use: Auto = <code>CONDITION_YAW</code> · Guided = <code>GUID_OPTIONS</code> bit 7</p>
-  <ul class="pit big tight">
-    <li><b>1.</b> <code>AR_PosControl::init</code> reset the fixed heading → lateral output stalled</li>
-    <li><b>2.</b> Pivot turn fought the fixed heading</li>
-  </ul>
-  <aside class="notes">1:05 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a CONDITION_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Two pitfalls: init reset the fixed heading; the pivot turn fought it. The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
+  <p class="sub">Use: Auto = <code>CONDITION_YAW</code> · Guided = <code>GUID_OPTIONS</code> bit 7 · omni frames only</p>
+  <aside class="notes">0:50 — One diagram: Guided/Auto position target → waypoint nav (fixed heading) → position controller (fwd / lat split) → lateral PID → motors. AI support helped with the Rover code and the changes; we checked them on the real boat. Usage: in Auto a CONDITION_YAW (MAV_CMD_CONDITION_YAW) command sets the fixed heading; in Guided set bit 7 of GUID_OPTIONS; omni frames only. Pitfalls come on the next slide.</aside>
 </section>
-<!-- 6. On-water test (0:35) -->
+
+<!-- 7. Pitfalls (0:25) -->
+<section>
+  <h2>Pitfalls</h2>
+  <ul class="big">
+    <li><code>AR_PosControl::init</code> reset the fixed heading<br><span class="hl">→ lateral output stalled</span></li>
+    <li>Pivot turn fought the fixed heading<br><span class="hl">→ Rover turned, we wanted to hold</span></li>
+  </ul>
+  <aside class="notes">0:25 — Two pitfalls: init reset the fixed heading, so the lateral output stalled; the pivot turn fought it (Rover tried to turn, we wanted to hold the heading). The third (no lateral feed-forward) comes back on the Why slow? slide.</aside>
+</section>
+
+<!-- 8. On-water test (0:35) -->
 <section>
   <h2>On-water test: slow, and short of the target</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes">0:35 — Role: observation, no numbers. This video is a lateral-move test with ONE boat (not the 3-boat show). Watch the sideways movement: compared with moving forward it is slower, and it tends to stop short of the target. Do not describe video details beyond this. The 3-boat show residuals (0.30 / 1.18 / 0.40 m, 2026-05-18) are Q&amp;A only.</aside>
 </section>
-<!-- 7. It is slow (0:40) -->
+<!-- 9. It is slow (0:40) -->
 <section>
   <h2>It is slow</h2>
   <p class="sub">Guided GoTo ×19 · QZSS CLAS (no base station)</p>
@@ -147,7 +154,7 @@
   <div class="bars" style="font-size:1.05em;margin-top:1.2em"><div class="row"><span class="lbl">Lateral only</span><div class="track"><div class="fill lat" style="width:15.5%"></div></div><span class="val">0.23–0.31 m/s</span></div><div class="row"><span class="lbl">Forward</span><div class="track"><div class="fill" style="width:28.5%"></div></div><span class="val">0.36–0.57 m/s</span></div><div class="row"><span class="lbl">Target</span><div class="track"><div class="fill" style="width:100%;background:var(--line)"></div></div><span class="val">2.0 m/s</span></div></div>
   <aside class="notes">0:40 — Role: measurement. The flight logs confirm what we saw. Peak speed from the EKF in the body frame: about 0.3 m/s lateral, 0.55 m/s forward, so about half. "About half" is first said here.</aside>
 </section>
-<!-- 8. Stops short (0:30) -->
+<!-- 10. Stops short (0:30) -->
 <section>
   <h2>It also stops short</h2>
   <ul class="big">
@@ -157,7 +164,7 @@
   </ul>
   <aside class="notes">0:30 — Role: measurement + confirmed cause. "Reached" fires 0.3 to 1.8 m before the target because WP_RADIUS was 2 m; then lateral drive is cut, the fixed heading is cleared, loiter starts. WpDist after "reached" measures the distance to the loiter point, so the earlier 22/22 reached did not mean the boat arrived. Next: test with a small WP_RADIUS.</aside>
 </section>
-<!-- 9. Why slow? (0:35) -->
+<!-- 11. Why slow? (0:35) -->
 <section>
   <h2>Why slow?</h2>
   <p><span class="tag">Likely cause — not verified yet</span></p>
@@ -170,13 +177,13 @@
   </ul>
   <aside class="notes">0:35 — Role: analysis. We don't know yet; we can't prove it because the lateral PID is not logged. Top suspect: no cruise-throttle feed-forward on the lateral axis (forward has it). Unverified. Other suspects (ATC_LAT_P/I, shared ATC_ACCEL_MAX) are Q&amp;A only. Next (also on the slide): add the PIDL log, retest with a small WP_RADIUS, then tune.</aside>
 </section>
-<!-- 10. 3D show simulator (0:35) -->
+<!-- 12. 3D show simulator (0:35) -->
 <section>
   <h2>3D show simulator</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes">0:35 — Few chances to test the real boat, so the show content was not fully tested. So we built a 3D simulator: SITL (rover-omni3mecanum) + the lateral-move firmware. The same JSON show runs here, with several boats.</aside>
 </section>
-<!-- 11. Summary (0:50) -->
+<!-- 13. Summary (0:50) -->
 <section>
   <h2>Summary &amp; ask</h2>
     <ul class="big">
