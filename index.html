@@ -27,9 +27,7 @@
 
 <h2>Slides</h2>
 <div class="row">
-  <a class="btn main" href="en/">Slides (English)</a>
-  <a class="btn main" href="ja/">スライド (日本語)</a>
-  <a class="btn main" href="en-2/">Slides (English, lighter)</a>
+  <a class="btn main" href="en-2/">Slides (English)</a>
 </div>
 
 <h2>Dark themes</h2>
@@ -49,9 +47,7 @@
       var d = document.createElement('div');
       d.className = 'card' + (t === cur ? ' on' : '');
       d.innerHTML = '<b>' + t + '</b>' +
-        '<a class="btn" href="en/?theme=' + t + '">EN</a>' +
-        '<a class="btn" href="ja/?theme=' + t + '">JA</a>' +
-        '<a class="btn" href="en-2/?theme=' + t + '">EN-2</a>';
+        '<a class="btn" href="en-2/?theme=' + t + '">Open</a>';
       box.appendChild(d);
     });
   });
