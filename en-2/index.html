@@ -240,10 +240,11 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js"></script>
+<script src="stackchan-bridge.js"></script>
 <script>
   Reveal.initialize({
     hash: true, center: false, slideNumber: 'c/t', width: 1280, height: 720,
-    transition: 'none', preloadIframes: false, plugins: [ RevealNotes ]
+    transition: 'none', preloadIframes: false, plugins: [ RevealNotes, StackchanBridge ]
   });
   // keep presenter.html (script-first presenter page) in sync with this window
   try {
