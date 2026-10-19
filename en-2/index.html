@@ -100,14 +100,14 @@
 </section>
 
 <!-- 3. What can it do? (0:35) -->
-<section data-stackchan-motion="spin">
+<section data-stackchan-motion="nod">
   <h2>What can it do?</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/88uq0-AOGSM?rel=0" title="Arivia" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>3 / 14</b> · What can it do? · 目安 <b>0:35</b> · 累計 <b>1:25</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0"><i>(動画を再生)</i> (While this plays) Here is what it does.<br>It has LEDs on the floater and the half-dome.<br>There is a fountain on top, and a pump underneath draws the water up.<br>Several units perform a synchronized show on the water.<br>Under the hood, it's ArduPilot Rover on a Cube Orange, with an X-frame thruster layout.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 何ができるか</b>。動画は音なしなので、流しながら構造(LED / 噴水 / ポンプ)・複数台の同期・構成(Rover / Cube Orange / X フレーム)を話す。仕様は公開情報の範囲で。動画の中身を推測で描写しない。</p></aside>
 </section>
 
 <!-- 4. System architecture (0:55) -->
-<section data-stackchan-motion="nod">
+<section data-stackchan-motion="spin">
   <h2>System architecture</h2>
   <div class="arch">
     <div class="n"><h3>GCS</h3>
@@ -134,14 +134,14 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>5 / 14</b> · Why lateral move? · 目安 <b>0:30</b> · 累計 <b>2:50</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">So, why do we need lateral move?<br>An X-frame can move in any direction.<br>But Rover normally turns first, then moves forward.<br>In a show, that looks wrong.<br>We want to hold the heading, so the LEDs and the fountain keep facing the audience, while the boat moves sideways.<br>That means a fixed heading, and a lateral velocity.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: なぜ必要か</b>。問題(旋回 → 前進)→ 欲しい動き(機首固定で横移動)→ キーワード <b>fixed heading / lateral velocity</b>。Issue と既存機能の話は 6 枚目に回した(重複させない)。</p></aside>
 </section>
 <!-- 6. Upstream issue #9352 (0:20) -->
-<section data-stackchan-motion="spin">
+<section data-stackchan-motion="nod">
   <h2>Open since 2018: ArduPilot issue <a href="https://github.com/ArduPilot/ardupilot/issues/9352" target="_blank" rel="noopener"><span class="hl">#9352</span></a></h2>
   <div class="vid wide"><img src="issue-9352.jpg" alt="ArduPilot issue #9352: Rover: support do-set-yaw on vehicles that support lateral control" style="width:100%;border-radius:8px;display:block"></div>
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>6 / 14</b> · Open since 2018: issue #9352 · 目安 <b>0:20</b> · 累計 <b>3:10</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">I asked Randy Mackay, the Rover maintainer, about this.<br>He pointed me to issue 9352, which has been open since 2018.<br>It's the same idea: a fixed heading with lateral movement.<br>We built our implementation on Rover 4.6.3.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>5 ページと同じ内容</b>(機首固定で横移動)だと一言で伝える。<b>Randy Mackay さん本人に相談して、この Issue を教えてもらった</b>(2018 年から Open)。彼の手順に沿って Rover 4.6.3 で実装。細かい手順(横速度コントローラ → AR_WPNav → モーター)や「Manual / Acro は横移動できるが Auto / Guided が不足」は、聞かれたら話す。</p></aside>
 </section>
 
 <!-- 7. Implementation (0:55) -->
-<section data-stackchan-motion="nod">
+<section data-stackchan-motion="shake">
   <h2>Implementation</h2>
   <p class="sub">Rover-4.6.3 + 5 commits · 16 files · +661 / −69 · with AI support</p>
   <p class="sub">Existing: aim at the target → turn → drive &nbsp;·&nbsp; <span style="color:var(--accent2)">highlighted</span> = changed / added</p>
@@ -158,7 +158,7 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
 </section>
 
 <!-- 8. Pitfalls (0:55) -->
-<section data-stackchan-motion="shake">
+<section data-stackchan-motion="spin">
   <h2>Pitfalls <small style="font-size:.6em;color:var(--muted)">(found in the simulator)</small></h2>
   <div class="card">
     <h3>1. Pivot turn <small>AR_WPNav</small></h3>
@@ -178,13 +178,13 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
 </section>
 
 <!-- 9. On-water test (0:35) -->
-<section data-stackchan-motion="spin">
+<section data-stackchan-motion="nod">
   <h2>On-water test: slow, and short of the target</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/uQuQ4oddNLk?rel=0" title="Lateral test" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>9 / 14</b> · On-water test: slow, and short of the target · 目安 <b>0:35</b> · 累計 <b>5:35</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0"><i>(動画を再生)</i> (While this plays) This is a lateral-move test with one boat on the water.<br>Watch the sideways movement.<br>It's noticeably slower than forward movement.<br>It also tends to stop short of the target.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 現象を見せる(観察)</b>。動画は <b>1 台での横移動の検証</b>(3 台のショーではない)。<b>速度の数字は言わない</b>(速度は 10 で初めて言う)。「前後に比べて遅い」「手前で止まりやすい」だけを、動画を見せながら。動画の中身を推測で描写しない。3 台のショー(5/18)の終端残差 0.30 / 1.18 / 0.40 m は、ここでは言わない(想定質問へ)。</p></aside>
 </section>
 <!-- 10. It is slow (0:40) -->
-<section data-stackchan-motion="nod">
+<section data-stackchan-motion="shake">
   <h2>It is slow</h2>
   <p class="sub">Guided GoTo ×19 · QZSS CLAS (no base station)</p>
   <ul class="big">
@@ -194,7 +194,7 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>10 / 14</b> · It is slow · 目安 <b>0:40</b> · 累計 <b>6:15</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">The flight logs confirm what we saw.<br>We analyzed 19 Guided GoTo moves, with QZSS CLAS positioning and no base station.<br>On pure lateral moves, the peak speed was 0.23 to 0.31 meters per second.<br>On forward moves, it was 0.36 to 0.57.<br>So sideways reached about half the peak speed of forward moves.<br>But both were far below the 2.0 meters-per-second target.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 速度を計測で裏付ける</b>。EKF 速度を機体座標系に変換した最大速度: 横 0.23〜0.31(5 回)、前進主体 0.36〜0.57(10 回)、目標 2.0 m/s。標本が少ないので目安として話す。「約半分」はここで初めて言う。<b>比較は 2 つ(横 vs 前進のピーク速度 / ピーク速度 vs 目標 2.0 m/s)を、文を分けて言う</b>。平均でなく<b>ピーク</b>速度。</p></aside>
 </section>
 <!-- 11. Stops short (0:40) -->
-<section data-stackchan-motion="shake">
+<section data-stackchan-motion="nod">
   <h2>It also stops short</h2>
   <ul class="big">
     <li>"Reached" fires inside <code>WP_RADIUS</code> = 2 m<br><span class="hl">→ up to 2 m early, any direction</span></li>
@@ -218,13 +218,13 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>12 / 14</b> · Why slow? · 目安 <b>0:35</b> · 累計 <b>7:30</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">So, why is it slow?<br>We don't know yet.<br>We can't prove it, because the lateral PID is not logged.<br>But we have one hypothesis.<br>In the code, forward has a cruise-throttle feed-forward.<br>Lateral does not.<br>Without it, the lateral controller may not push hard enough against drag.<br>This is not verified.<br>Next, we'll add lateral PID logging, retest forward and sideways moves with a smaller WP_RADIUS, and tune the controller.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 原因分析(ここだけ仮説)</b>。「分からない → でも仮説がある」の順。仮説は <b>1 つに絞る</b>。<b>事実</b>(コードで確認済み): 横方向には cruise throttle の FF がない(<code>lateral_base = 0</code>、前後にはある)。<b>仮説</b>(未検証): それが遅さの原因で、抗力を補い切れていない(<b>may</b> で言う)。<b>未検証と明言</b>。ログ不足(lateral PID が未ログ)が理由。次の一手: PIDL ログ追加、WP_RADIUS を小さくして<b>前後・横の両方で</b>再試験、<code>ATC_LAT_FF</code> とゲインを 1 つずつ調整。<b>スライドにも「Next: lateral PID log · retest fwd / lateral with a smaller WP_RADIUS · tune」を出している</b>(台本の最後の文と対応)。スライドのログ行(ATT.DesYaw = 0)は台本では話さない。他の仮説は想定質問へ。</p></aside>
 </section>
 <!-- 13. 3D show simulator (0:35) -->
-<section data-stackchan-motion="nod">
+<section data-stackchan-motion="shake">
   <h2>3D show simulator</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>13 / 14</b> · 3D show simulator · 目安 <b>0:35</b> · 累計 <b>8:05</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0"><i>(動画を再生)</i> (While this plays) We rarely get time on the real boat, so we couldn't test the show content properly.<br>So we built a 3D simulator: SITL with the rover-omni3mecanum frame and our lateral-move firmware.<br>The same JSON show runs here, with several boats.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0">実機を試せない → シミュレータ(SITL + 横移動ファーム)→ 同じ JSON ショーが複数台で動く。</p></aside>
 </section>
 <!-- 14. Summary (0:50) -->
-<section data-stackchan-motion="shake">
+<section data-stackchan-motion="nod">
   <h2>Summary &amp; ask</h2>
     <ul class="big">
     <li>Fixed-heading lateral move works on a real boat</li>
