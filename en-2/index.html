@@ -63,8 +63,8 @@
   .flow.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.7em; font-size:var(--fs-m); counter-reset:step; }
   .flow.grid .a { display:none; }
   .flow.grid { grid-auto-rows:1fr; align-items:stretch; }
-  .flow.grid .n { counter-increment:step; padding:.6em .8em; display:flex; align-items:center; justify-content:center; text-align:center; }
-  .flow.grid .n::before { margin-right:.35em; content:counter(step) ". "; color:var(--accent2); font-weight:700; }
+  .flow.grid .n { counter-increment:step; padding:.6em .8em; display:flex; align-items:center; justify-content:flex-start; text-align:left; }
+  .flow.grid .n::before { display:inline-block; min-width:1.1em; margin-right:.2em; content:counter(step) ". "; color:var(--accent2); font-weight:700; }
   .big li { font-size:1.18em; margin:.55em 0; }
   .big.tight li { margin:.35em 0; }
   .vid.wide { width:1040px; margin:0 auto; }
