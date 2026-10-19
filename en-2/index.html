@@ -218,7 +218,7 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>12 / 14</b> · Why slow? · 目安 <b>0:35</b> · 累計 <b>7:30</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">So, why is it slow?<br>We don't know yet.<br>We can't prove it, because the lateral PID is not logged.<br>But we have one hypothesis.<br>In the code, forward has a cruise-throttle feed-forward.<br>Lateral does not.<br>Without it, the lateral controller may not push hard enough against drag.<br>This is not verified.<br>Next, we'll add lateral PID logging, retest forward and sideways moves with a smaller WP_RADIUS, and tune the controller.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 原因分析(ここだけ仮説)</b>。「分からない → でも仮説がある」の順。仮説は <b>1 つに絞る</b>。<b>事実</b>(コードで確認済み): 横方向には cruise throttle の FF がない(<code>lateral_base = 0</code>、前後にはある)。<b>仮説</b>(未検証): それが遅さの原因で、抗力を補い切れていない(<b>may</b> で言う)。<b>未検証と明言</b>。ログ不足(lateral PID が未ログ)が理由。次の一手: PIDL ログ追加、WP_RADIUS を小さくして<b>前後・横の両方で</b>再試験、<code>ATC_LAT_FF</code> とゲインを 1 つずつ調整。<b>スライドにも「Next: lateral PID log · retest fwd / lateral with a smaller WP_RADIUS · tune」を出している</b>(台本の最後の文と対応)。スライドのログ行(ATT.DesYaw = 0)は台本では話さない。他の仮説は想定質問へ。</p></aside>
 </section>
 <!-- 13. 3D show simulator (0:35) -->
-<section data-stackchan-motion="shake">
+<section data-stackchan-motion="shake" data-transition="zoom">
   <h2>3D show simulator</h2>
   <div class="vid wide"><iframe referrerpolicy="strict-origin-when-cross-origin" data-src="https://www.youtube-nocookie.com/embed/Zxjar6_w95g?rel=0" title="3D sim" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
   <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>13 / 14</b> · 3D show simulator · 目安 <b>0:35</b> · 累計 <b>8:05</b> / 8:55</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0"><i>(動画を再生)</i> (While this plays) We rarely get time on the real boat, so we couldn't test the show content properly.<br>So we built a 3D simulator: SITL with the rover-omni3mecanum frame and our lateral-move firmware.<br>The same JSON show runs here, with several boats.</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0">実機を試せない → シミュレータ(SITL + 横移動ファーム)→ 同じ JSON ショーが複数台で動く。</p></aside>
@@ -244,7 +244,7 @@ Web UI のエピソード: 防水ケースをなかなか開けられないの�
 <script>
   Reveal.initialize({
     hash: true, center: false, slideNumber: 'c/t', width: 1280, height: 720,
-    transition: 'none', preloadIframes: false, plugins: [ RevealNotes, StackchanBridge ]
+    transition: 'fade', preloadIframes: false, plugins: [ RevealNotes, StackchanBridge ]
   });
   // keep presenter.html (script-first presenter page) in sync with this window
   try {
