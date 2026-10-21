@@ -6,6 +6,8 @@ Slides for "Arivia: Water-Surface Drone Shows with ArduPilot" (ArduPilot DevConf
   - Speaker view (en-2): press `S` for the reveal.js speaker view, or open `en-2/presenter.html` (script-first page: the whole script fits on screen, timer, next slide title; it follows and controls the slides window). Both are generated from `speaker-notes2.md` in claw-io-hub (`build_speaker_view.py`).
   - Phone / tablet script (Fold7 over USB): see [Fold7 で台本を追従表示する](#fold7-で台本を追従表示する) below.
 
+- Links page (the QR code on the last slide points here): `links/index.html` — code branch, ArduPilot issue #9352, slides, GitHub, X, YouTube, email. The QR image is `en-2/qr-links.svg`.
+
 Built with reveal.js (CDN). Serve over HTTP (`python3 serve.py`, or `python3 -m http.server` without the phone sync) so the embedded YouTube videos play.
 
 - Themes: pick one on the top page, or add `?theme=night` (default) / `dracula` / `moon` / `sky` etc. to a slide URL; the choice is remembered in the browser.
@@ -109,8 +111,9 @@ http://localhost:8000/en-2/?hud=compact&ghost=0.5
 - 右上に出すときは `?hud=top` に変えます。
 - **位置と大きさの調整**: `&edit` を付けて開くと、計器をドラッグで動かせます。右下の角（オレンジの三角）をドラッグすると大きさが変わります。ダブルクリックで初期の位置と大きさに戻ります。位置と大きさは、そのブラウザに保存されます。調整が終わったら `&edit` を外してください（外すと、操作を受け付けなくなります）。`&reset` を付けると、保存を消せます。
 
-スライドの右下に常に表示される小さな HUD です。`en-2/hud.js` と `en-2/hud.css` で作られ、テレメトリは `serve.py` の `/api/telemetry` から 0.1 秒ごとに取得します。
+スライドの右下に表示される小さな HUD です。**既定では表示しません**（`?hud`、`?hud=compact`、`?hud=top`、`?demo` のいずれかを URL に付けたときだけ、右下か右上に出ます）。`en-2/hud.js` と `en-2/hud.css` で作られ、テレメトリは `serve.py` の `/api/telemetry` から 0.1 秒ごとに取得します。
 
+- **地図つき**: `?hud` を付けると、地図・姿勢・速度・高度を表示します。
 - **デモ表示**: 機体がつながっていなくても動きを確認できます。`http://localhost:8000/en-2/index.html?demo` で開くと、模擬データを「DEMO」と表示します。
 - **計器だけ（地図なし）**: `?hud=compact` で右下、`?hud=top` で右上に、地図と速度・高度を隠した幅 220px の計器を表示します。姿勢計（緑が地面、青が空）とコンパス（方位、赤い N）を並べ、下にモード、アーム、バッテリー、電波（RSSI）、接続状態を出します（`http://localhost:8000/en-2/index.html?hud=top&demo`）。`&ghost` を足すと、計器全体（文字を含む）が薄くなり、背景のように見えます（`?hud=top&ghost&demo`）。濃さは `&ghost=0.3`（薄い）から `&ghost=0.7`（濃い）のように指定でき、既定は 0.5 です。
 - **非表示**: 写真や動画と重なるスライドの `<section>` に `data-hud="off"` を付けると、そのスライドでは隠れます。
