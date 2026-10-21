@@ -6,6 +6,8 @@ Slides for "Arivia: Water-Surface Drone Shows with ArduPilot" (ArduPilot DevConf
   - Speaker view (en-2): press `S` for the reveal.js speaker view, or open `en-2/presenter.html` (script-first page: the whole script fits on screen, timer, next slide title; it follows and controls the slides window). Both are generated from `speaker-notes2.md` in claw-io-hub (`build_speaker_view.py`).
   - Phone / tablet script (Fold7 over USB): see [Fold7 で台本を追従表示する](#fold7-で台本を追従表示する) below.
 
+- Links page (the QR code on the last slide points here): `links/index.html` — code branch, ArduPilot issue #9352, slides, GitHub, X, YouTube, email. The QR image is `en-2/qr-links.svg`.
+
 Built with reveal.js (CDN). Serve over HTTP (`python3 serve.py`, or `python3 -m http.server` without the phone sync) so the embedded YouTube videos play.
 
 - Themes: pick one on the top page, or add `?theme=night` (default) / `dracula` / `moon` / `sky` etc. to a slide URL; the choice is remembered in the browser.
