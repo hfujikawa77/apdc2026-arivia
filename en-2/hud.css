@@ -4,6 +4,11 @@
        background:var(--box); border:1px solid var(--line); border-radius:10px; overflow:hidden;
        color:var(--fg, inherit); font-size:20px; font-variant-numeric:tabular-nums; line-height:1.3; }
 .hud.off { display:none; }
+/* ?edit: the widget takes the pointer so it can be dragged; the grip in the corner resizes it */
+.hud.editable { pointer-events:auto; cursor:move; outline:2px dashed var(--accent2); touch-action:none; }
+.hud-grip { display:none; position:absolute; right:0; bottom:0; width:18px; height:18px; cursor:nwse-resize;
+            background:linear-gradient(135deg, transparent 50%, var(--accent2) 50%); }
+.hud.editable .hud-grip { display:block; }
 /* ?hud=compact (bottom-right) or ?hud=top (top-right): instruments only, a compact square */
 .hud.compact { width:220px; font-size:14px; }
 .hud.compact .hud-map, .hud.compact .hud-nums { display:none; }

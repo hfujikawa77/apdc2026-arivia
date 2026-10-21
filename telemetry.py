@@ -3,8 +3,8 @@
 
 usage: python telemetry.py [--listen 14551] [--server http://localhost:8000]
 
-Run it on Windows next to Mission Planner (pip install pymavlink). Mission Planner sends the
-MAVLink stream to UDP <listen>; this script keeps the latest values and POSTs them to
+Run it in WSL, next to serve.py (pip3 install pymavlink). Mission Planner sends the MAVLink
+stream to UDP <listen> on 127.0.0.1; this script keeps the latest values and POSTs them to
 serve.py (/api/telemetry), which the HUD (en-2/hud.js) polls.
 Nothing is posted while the MAVLink stream is silent, so the HUD shows NO LINK when the link drops.
 """

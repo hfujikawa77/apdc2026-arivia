@@ -62,6 +62,7 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--port', type=int, default=8000)
+    ap.add_argument('--host', default='127.0.0.1', help='0.0.0.0 to accept phones on the LAN (anyone on that network can then change the slide)')
     a = ap.parse_args()
-    print(f'serving {ROOT} on http://localhost:{a.port}/ (deck: en-2/index.html, presenter: en-2/presenter.html)')
-    ThreadingHTTPServer(('127.0.0.1', a.port), Handler).serve_forever()
+    print(f'serving {ROOT} on http://{a.host}:{a.port}/ (deck: en-2/index.html, presenter: en-2/presenter.html)')
+    ThreadingHTTPServer((a.host, a.port), Handler).serve_forever()

@@ -88,6 +88,65 @@ document.addEventListener('DOMContentLoaded', () => {  // after the deck's inlin
     hud.style.opacity = params.get('ghost') || '0.5';
   }
 
+  // ---- position and size: saved per viewer in localStorage ----
+  // ?edit: drag the widget to move it, drag the corner grip to resize, double-click to reset.
+  // Without ?edit the widget ignores the pointer, so it never gets in the way while presenting.
+  // ?reset: forget the saved position and size.
+  const BASE_WIDTH = hud.classList.contains('compact') ? 220 : 360;
+  const LAYOUT_KEY = 'hud-layout';
+  const applyLayout = l => {
+    hud.style.left = l.left + 'px';
+    hud.style.top = l.top + 'px';
+    hud.style.right = 'auto';
+    hud.style.bottom = 'auto';
+    hud.style.zoom = l.zoom;
+  };
+  const saveLayout = () => {
+    try { localStorage.setItem(LAYOUT_KEY, JSON.stringify({ left: hud.offsetLeft, top: hud.offsetTop, zoom: parseFloat(hud.style.zoom) || 1 })); } catch (e) {}
+  };
+  if (params.has('reset')) { try { localStorage.removeItem(LAYOUT_KEY); } catch (e) {} }
+  try { const saved = JSON.parse(localStorage.getItem(LAYOUT_KEY) || 'null'); if (saved) applyLayout(saved); } catch (e) {}
+
+  if (params.has('edit')) {
+    hud.classList.add('editable');
+    const grip = document.createElement('div');
+    grip.className = 'hud-grip';
+    hud.appendChild(grip);
+    // pointer position in slide-canvas units (the canvas is scaled to fit the window)
+    const canvasPoint = e => {
+      const r = host.getBoundingClientRect();
+      const s = r.width / host.offsetWidth;
+      return { x: (e.clientX - r.left) / s, y: (e.clientY - r.top) / s };
+    };
+    let drag = null;
+    hud.addEventListener('pointerdown', e => {
+      const p = canvasPoint(e);
+      if (!hud.style.left) applyLayout({ left: hud.offsetLeft, top: hud.offsetTop, zoom: 1 });
+      drag = { resizing: e.target === grip, p, left: hud.offsetLeft, top: hud.offsetTop, zoom: parseFloat(hud.style.zoom) || 1 };
+      hud.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    hud.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const p = canvasPoint(e);
+      const dx = p.x - drag.p.x;
+      const dy = p.y - drag.p.y;
+      if (drag.resizing) {
+        hud.style.zoom = Math.min(2.5, Math.max(0.5, (BASE_WIDTH * drag.zoom + dx) / BASE_WIDTH));
+      } else {
+        hud.style.left = (drag.left + dx) + 'px';
+        hud.style.top = (drag.top + dy) + 'px';
+      }
+    });
+    const endDrag = () => { if (drag) { saveLayout(); drag = null; } };
+    hud.addEventListener('pointerup', endDrag);
+    hud.addEventListener('pointercancel', endDrag);
+    hud.addEventListener('dblclick', () => {
+      ['left', 'top', 'right', 'bottom', 'zoom'].forEach(k => { hud.style[k] = ''; });
+      try { localStorage.removeItem(LAYOUT_KEY); } catch (e) {}
+    });
+  }
+
   const $ = id => document.getElementById(id);
   const map = L.map('hud-map', {
     zoomControl: false, attributionControl: false, dragging: false, scrollWheelZoom: false,
