@@ -1,5 +1,6 @@
 // reveal.js-independent HUD widget: a Leaflet map and an attitude / speed / altitude readout,
 // fixed in the bottom-right of every slide. Telemetry comes from serve.py (GET /api/telemetry).
+// Hidden by default: it appears only with ?hud (map + instruments), ?hud=compact / ?hud=top, or ?demo.
 //   ?demo   show a simulated vehicle when no live telemetry arrives (labelled DEMO)
 //   ?hud=compact  instruments only (no map), bottom-right;  ?hud=top  the same, top-right
 //   ?ghost[=0.5]  fade the whole widget so it reads as background
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {  // after the deck's inlin
   const params = new URLSearchParams(location.search);
   const DEMO = params.has('demo');                  // used only while no live telemetry arrives
   const FORCE_DEMO = params.get('demo') === 'force'; // ?demo=force: always the simulated vehicle
+  if (!params.has('hud') && !params.has('demo')) return;  // off unless asked for in the URL
 
   const host = document.querySelector('.reveal .slides');
   if (!host || typeof L === 'undefined') return;
