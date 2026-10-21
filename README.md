@@ -62,7 +62,52 @@ PC のスライドを進めると、USB 接続した Fold7 の台本（`presente
 
 `serve.py` は `127.0.0.1:8000` で待ち受けます。WSL2 の localhost 転送が効かない環境では、`adb reverse` は通っていても表示できないことがあります。その場合は `serve.py` の待ち受けアドレスを変える必要があります。
 
+## Fold7 で台本を無線（LAN）で表示する
+
+USB が不安定なときは、同じネットワークの IP アドレスで開きます。adb は要りません。PC と Fold7 を同じネットワーク（例: Fold7 のテザリング）につなぎます。
+
+Windows の IP を `ipconfig` で確認します（例: `192.168.3.38`）。WSL は NAT 方式なので、Windows から WSL へ転送が必要です。
+
+1. **WSL で待ち受け先を LAN に変えて起動**（`--host 0.0.0.0` が必要です）
+   ```bash
+   python3 serve.py --host 0.0.0.0
+   ```
+   表示が `serving ... on http://0.0.0.0:8000/` になっていることを確認します。
+2. **Windows（PowerShell、管理者）で 8000 番を WSL へ転送**
+   ```powershell
+   netsh interface portproxy add v4tov4 listenport=8000 listenaddress=0.0.0.0 connectport=8000 connectaddress=<WSLのIP>
+   ```
+   `<WSLのIP>` は WSL で `hostname -I` の先頭の値です（例: `172.19.92.194`）。
+3. **Windows（PowerShell、管理者）でファイアウォールを許可**（初回のみ）
+   ```powershell
+   New-NetFirewallRule -DisplayName "apdc deck 8000" -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow
+   ```
+4. **確認（PowerShell）**
+   ```powershell
+   Test-NetConnection 192.168.3.38 -Port 8000
+   ```
+   `TcpTestSucceeded : True` なら、Fold7 から開けます。
+5. **Fold7 の Chrome で開く**
+   ```
+   http://192.168.3.38:8000/en-2/presenter.html
+   ```
+
+**注意**
+- WSL を再起動すると、WSL の IP が変わります。その場合は手順 2 の転送を作り直してください（古い設定は `netsh interface portproxy delete v4tov4 listenport=8000 listenaddress=0.0.0.0` で消せます）。
+- 発表が終わったら、転送を消してください。
+- `serve.py` を LAN に公開すると、同じネットワークの誰でもスライドの番号を変えられます。信頼できる回線（テザリングなど）だけで使ってください。
+- `portproxy` に `192.168.3.38:50021` の設定が別にある場合は、そのままにしてください（この手順とは無関係です）。
+
 ## HUD ウィジェット（地図・姿勢・速度・高度）
+
+**起動する URL（計器を右下、半透明で表示）**
+```
+http://localhost:8000/en-2/?hud=compact&ghost=0.5
+```
+- 機体のデータを使うときは、この URL のまま開きます（接続アイコンが緑なら受信中）。
+- 模擬データで動きを確認するときは、末尾に `&demo=force` を付けます。
+- 右上に出すときは `?hud=top` に変えます。
+- **位置と大きさの調整**: `&edit` を付けて開くと、計器をドラッグで動かせます。右下の角（オレンジの三角）をドラッグすると大きさが変わります。ダブルクリックで初期の位置と大きさに戻ります。位置と大きさは、そのブラウザに保存されます。調整が終わったら `&edit` を外してください（外すと、操作を受け付けなくなります）。`&reset` を付けると、保存を消せます。
 
 スライドの右下に常に表示される小さな HUD です。`en-2/hud.js` と `en-2/hud.css` で作られ、テレメトリは `serve.py` の `/api/telemetry` から 0.1 秒ごとに取得します。
 
@@ -71,8 +116,8 @@ PC のスライドを進めると、USB 接続した Fold7 の台本（`presente
 - **非表示**: 写真や動画と重なるスライドの `<section>` に `data-hud="off"` を付けると、そのスライドでは隠れます。
 - **テレメトリの形式**: `POST /api/telemetry` に次のキーを JSON で送ります。`lat`, `lon`（度）、`alt`（m）、`spd`（m/s）、`hdg`（度）、`roll`, `pitch`（度）、`mode`（文字列）、`armed`（真偽値）、`batt`（%）、`rssi`（電波の強さ %、任意）。サーバーが受信時刻 `t` を付けます。3 秒以上届かないと接続アイコン（コンセント）が赤になります。計器の下部は、電池（残量の色と数値）、電波（4 本の棒と数値）、接続（コンセントの色）のアイコンで表示します。
 - **実機・SITL の値を流す**: `telemetry.py` が Mission Planner の UDP 出力（14551）を受けて、`serve.py` に送ります。
-  1. Windows に pymavlink を入れます: `pip install pymavlink`
+  1. WSL に pymavlink を入れます（初回のみ）: `pip3 install pymavlink`
   2. Mission Planner の Advanced Tools（`Ctrl + F`）→ MAVLink の転送を Outbound、UDP、送り先 `127.0.0.1` ポート `14551`、Write access はオフで接続します。
-  3. `serve.py` を WSL で起動したまま、Windows で `python telemetry.py` を実行します（既定は `--listen 14551`、`--server http://localhost:8000`）。
+  3. `serve.py` と同じ WSL で、`python3 telemetry.py` を実行します（既定は `--listen 14551`、`--server http://localhost:8000`）。受信数が表示されれば、Mission Planner からのデータが届いています。
   4. HUD を `?hud=compact` などで開くと、機体の値が出ます（`&demo` は外す）。機体の接続が切れると 3 秒後に接続アイコンが赤になります。
 - **注意**: 地図のタイルは OpenStreetMap から読み込むので、インターネットに接続している必要があります。
