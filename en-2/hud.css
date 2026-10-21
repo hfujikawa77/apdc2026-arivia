@@ -1,0 +1,34 @@
+/* HUD widget: map + attitude / speed / altitude, fixed in the bottom-right of every slide.
+   Sits inside .slides, so it scales with the 1280x720 slide canvas. */
+.hud { position:absolute; right:24px; bottom:24px; width:360px; z-index:1000; pointer-events:none;
+       background:var(--box); border:1px solid var(--line); border-radius:10px; overflow:hidden;
+       color:var(--fg, inherit); font-size:20px; font-variant-numeric:tabular-nums; line-height:1.3; }
+.hud.off { display:none; }
+/* ?hud=compact (bottom-right) or ?hud=top (top-right): instruments only, a compact square */
+.hud.compact { width:220px; font-size:14px; }
+.hud.compact .hud-map, .hud.compact .hud-nums { display:none; }
+.hud.compact .hud-body { justify-content:center; gap:6px; padding:10px 6px 6px; }
+.hud.compact .hud-att, .hud.compact .hud-compass { width:100px; height:100px; }
+.hud.compact .hud-status { gap:4px; padding:6px 8px 8px; font-size:9.5px; white-space:nowrap; }
+.hud.compact .ic { width:1.3em; height:1em; }
+.hud.compact .hud-link svg { width:1.2em; height:1.2em; }
+.hud.top { top:24px; bottom:auto; }
+/* ?ghost[=0.5]: the whole widget, text included, is faded so it reads as background */
+.hud.ghost { background:none; border-color:transparent; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.hud-map { height:150px; background:var(--sunk); }
+/* reveal.js sets max-width/max-height on img; Leaflet tiles must keep their natural size */
+.hud-map img { max-width:none !important; max-height:none !important; }
+.hud-body { display:flex; gap:10px; align-items:center; padding:8px 10px; }
+.hud-att, .hud-compass { width:96px; height:96px; flex:none; display:block; }
+.hud-hdg { position:relative; flex:none; }
+.hud-nums { flex:1; }
+.hud-nums b { color:var(--accent); font-size:1.3em; font-weight:700; }
+.hud-status { display:flex; justify-content:space-between; gap:6px; padding:0 10px 8px; font-size:15px; color:var(--muted); }
+.hud-status b { color:var(--fg, inherit); }
+.ic { width:1.5em; height:1.1em; vertical-align:-0.2em; }
+.hud-ic svg { color:#4caf50; }
+.hud-link svg { width:1.4em; height:1.4em; vertical-align:-0.25em; }
+.hud-link.live { color:#4caf50; }
+.hud-link.demo { color:var(--accent2); }
+.hud-link.none { color:#ff7043; }
+.hud-arm.on { color:#ff5252; font-weight:700; }

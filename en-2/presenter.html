@@ -100,6 +100,10 @@ $('tm').onclick = toggle;
 $('open').onclick = () => window.open('./index.html#/' + cur, 'arivia-slides');
 if (ch) ch.onmessage = m => { if (m.data && m.data.t === 'slide') go(m.data.h, false); };
 window.addEventListener('resize', fit);
+// follow the deck across devices via serve.py (works on a phone over USB; fails quietly on file://)
+setInterval(async () => {
+  try { const s = await (await fetch('../api/state',{ cache: 'no-store' })).json(); if (s && s.h !== undefined) go(s.h, false); } catch (e) {}
+}, 400);
 setInterval(tick, 250);
 render();
 </script>
