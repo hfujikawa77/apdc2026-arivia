@@ -3,7 +3,7 @@
 //   reveal.js  -> Stack-chan {"type":"slide","indexh":3,"indexv":0,"title":"..."}  (every slidechanged)
 // Without ?sc=<ip> (or a remembered one) it does nothing, so the deck works as usual.
 (function () {
-  const HEARTBEAT_MS = 10000; // firmware drops a socket that is silent for 30 s
+  const HEARTBEAT_MS = 10000; // firmware drops a socket that is silent for 90 s
   const RETRY_MIN_MS = 1000;
   const RETRY_MAX_MS = 5000;
 
@@ -28,6 +28,7 @@
       let ws = null;
       let retryMs = RETRY_MIN_MS;
       let heartbeat = null;
+      let ledHeld = false; // an earlier slide set the LED; the next slide must replace or clear it
 
       const send = (obj) => {
         if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
@@ -48,8 +49,17 @@
         const el = deck.getCurrentSlide();
         const motion = el && el.dataset.stackchanMotion;
         if (['nod', 'shake', 'spin', 'none'].includes(motion)) msg.motion = motion;
-        // the firmware accepts up to 190 bytes per frame; drop characters until it fits
-        while (new TextEncoder().encode(JSON.stringify(msg)).length > 180 && msg.title) {
+        // data-stackchan-led='{"pattern":"breath","color":"#0078C8","speed":5}' (same JSON as the Web UI LED page),
+        // or a preset name such as "ocean". Held until the next slide; slides without it clear a held LED.
+        const ledAttr = el && el.dataset.stackchanLed;
+        if (ledAttr) {
+          try { msg.led = ledAttr.trim().startsWith('{') ? JSON.parse(ledAttr) : { preset: ledAttr.trim() }; }
+          catch (e) { console.warn('[stackchan] bad data-stackchan-led', e); }
+        }
+        if (msg.led) ledHeld = true;
+        else if (ledHeld) { msg.led = { off: true }; ledHeld = false; }
+        // the firmware accepts up to 440 bytes per frame; drop title characters until it fits
+        while (new TextEncoder().encode(JSON.stringify(msg)).length > 420 && msg.title) {
           msg.title = Array.from(msg.title).slice(0, -1).join('');
         }
         send(msg);
