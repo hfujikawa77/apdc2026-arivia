@@ -14,7 +14,7 @@ Built with reveal.js (CDN). Serve over HTTP (`python3 serve.py`, or `python3 -m 
 
 ## Fold7 で台本を追従表示する
 
-PC のスライドを進めると、USB 接続した Fold7 の台本（`presenter.html`）も同じスライドに追従します。台本は追従のみで、Fold7 からはスライドを操作しません。
+PC のスライドと、USB 接続した Fold7 の台本（`presenter.html`）は同じスライド番号を共有します。どちらで進めても、もう片方も同じスライドに移動します。Fold7 では左右スワイプで進められ、⛶ ボタンで全画面になります。
 
 仕組み: `serve.py`（WSL）が配信し、スライドが切り替わるたびに現在の番号を `/api/state` に保存します。Fold7 の台本はその番号を 0.4 秒ごとに取得します。
 
