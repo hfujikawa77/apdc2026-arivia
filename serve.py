@@ -29,8 +29,44 @@ class Handler(SimpleHTTPRequestHandler):
         key = ROUTES.get(self.path.split('?')[0])
         if key:
             self.send_json(store.get(key, {}))
+        elif self.headers.get('Range'):
+            self.send_range()
         else:
             super().do_GET()
+
+    def send_range(self):
+        # SimpleHTTPRequestHandler ignores Range, so the browser cannot seek in the videos (they start from 0)
+        path = self.translate_path(self.path)
+        if not os.path.isfile(path):
+            return super().do_GET()
+        size = os.path.getsize(path)
+        try:
+            unit, _, spec = self.headers['Range'].partition('=')
+            first, _, last = spec.split(',')[0].strip().partition('-')
+            start = int(first) if first else size - int(last)
+            end = min(int(last) if first and last else size - 1, size - 1)
+        except ValueError:
+            return super().do_GET()
+        if unit.strip() != 'bytes' or start < 0 or start > end:
+            self.send_response(416)
+            self.send_header('Content-Range', f'bytes */{size}')
+            self.end_headers()
+            return
+        self.send_response(206)
+        self.send_header('Content-Type', self.guess_type(path))
+        self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Content-Range', f'bytes {start}-{end}/{size}')
+        self.send_header('Content-Length', str(end - start + 1))
+        self.end_headers()
+        with open(path, 'rb') as f:
+            f.seek(start)
+            remaining = end - start + 1
+            while remaining > 0:
+                chunk = f.read(min(65536, remaining))
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
+                remaining -= len(chunk)
 
     def do_POST(self):
         key = ROUTES.get(self.path.split('?')[0])

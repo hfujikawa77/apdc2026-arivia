@@ -49,6 +49,9 @@
         const el = deck.getCurrentSlide();
         const motion = el && el.dataset.stackchanMotion;
         if (['nod', 'shake', 'spin', 'none'].includes(motion)) msg.motion = motion;
+        // data-stackchan-expression="neutral|happy|sad|angry|doubt|sleepy"; omitted = the firmware's per-index cycle
+        const expr = el && el.dataset.stackchanExpression;
+        if (['neutral', 'happy', 'sad', 'angry', 'doubt', 'sleepy'].includes(expr)) msg.expression = expr;
         // data-stackchan-led='{"pattern":"breath","color":"#0078C8","speed":5}' (same JSON as the Web UI LED page),
         // or a preset name such as "ocean". Held until the next slide; slides without it clear a held LED.
         const ledAttr = el && el.dataset.stackchanLed;
