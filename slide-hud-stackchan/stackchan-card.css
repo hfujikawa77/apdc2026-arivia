@@ -1,0 +1,15 @@
+/* Stack-chan card: expression, motion and LED of the current slide, shown on every slide (bottom-left). */
+.stk-card { position:absolute; left:24px; bottom:24px; z-index:999; pointer-events:none;
+            background:var(--box); border:2px solid var(--accent); border-radius:12px;
+            padding:12px 18px; font-size:26px; line-height:1.4; color:var(--fg, inherit);
+            font-variant-numeric:tabular-nums; white-space:nowrap; }
+.stk-card.off { display:none; }
+/* ?edit: the card takes the pointer so it can be dragged */
+.stk-card.editable { pointer-events:auto; cursor:move; outline:2px dashed var(--accent2); touch-action:none; }
+.stk-card .row { display:flex; align-items:center; gap:.5em; }
+.stk-card .row + .row { margin-top:.2em; }
+.stk-card .lbl { font-weight:700; color:var(--accent); min-width:2.6em; }
+.stk-card .val { color:var(--fg, inherit); }
+.stk-card .val.def { color:var(--muted); }
+.stk-card .dot { display:inline-block; width:.8em; height:.8em; border-radius:50%; background:var(--line); }
+.stk-card .name { color:var(--muted); font-size:.85em; }

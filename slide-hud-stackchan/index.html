@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MAVStackchan: MAVLink と reveal.js の連携</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
+<link id="theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/night.min.css">
+<script src="../theme.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="../en-2/hud.css">
+<link rel="stylesheet" href="stackchan-card.css">
+<style>
+  :root { --accent:#4cc3ff; --accent2:#ffb347; --muted:#9aa7b4; --box:#16212b; --line:#2c3e4e; --sunk:#1b2733; --ph-bg:#10171e; --ph-line:#3a4a5a; --chip:#22313f; --fs-m:.82em; --fs-s:.71em; }
+  :root.light { --accent:#0b6fa8; --accent2:#b85400; --muted:#566370; --box:#eef3f7; --line:#c3cfd9; --sunk:#e3eaf0; --ph-bg:#f3f6f9; --ph-line:#aab8c4; --chip:#dde5ec; }
+  .reveal { font-size: 34px; }
+  .reveal h1, .reveal h2 { text-transform: none; letter-spacing: 0; }
+  .reveal h1 { font-size: 1.9em; }
+  .reveal h2 { font-size: 1.3em; color: var(--accent); margin-bottom: .6em; }
+  .reveal section { text-align: left; }
+  .reveal section.center-slide { text-align: center; }
+  /* top-aligned: every slide title sits at the same height */
+  .reveal .slides > section { padding-top: 24px; box-sizing: border-box; }
+  .reveal .slides > section.center-slide { padding-top: 150px; }
+  .reveal ul { display: block; margin-left: 1em; }
+  .reveal li { margin: .35em 0; }
+  .reveal li, .reveal p { text-wrap: pretty; }
+  .sub { color: var(--muted); font-size: var(--fs-m); }
+  .sub.s { font-size: var(--fs-s); }
+  .center-slide .sub { font-size: .95em; }
+  .hl { color: var(--accent2); }
+  code { color: var(--accent2); background: var(--sunk); padding: 0 .25em; border-radius: 4px; font-size: .85em; }
+  .flow { display:flex; align-items:center; justify-content:center; gap:.4em; flex-wrap:wrap; font-size:var(--fs-s); margin:.6em 0; }
+  .flow .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.4em .6em; text-align:center; }
+  .flow .a { color:var(--muted); }
+  .cols { display:flex; gap:1em; }
+  .cols > div { flex:1; }
+  .cols > .pic.wide-pic { flex:0 0 44%; align-items:flex-start; }
+  .cols > .pic { flex:0 0 40%; display:flex; justify-content:center; }
+  .pic img { max-height:560px; max-width:100%; width:auto; border-radius:10px; display:block; }
+  .ph { border:2px dashed var(--ph-line); border-radius:10px; color:var(--muted); font-size:.6em;
+        padding:1.6em 1em; text-align:center; background:var(--ph-bg); }
+  .tag { display:inline-block; font-size:var(--fs-s); background:var(--chip); border-radius:6px; padding:.1em .5em; color:var(--muted); }
+  .arch { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:.5em; font-size:var(--fs-m); align-items:stretch; }
+  .arch .n { background:var(--box); border:1px solid var(--line); border-radius:8px; padding:.6em; }
+  .arch h3 { font-size:1em; margin:0 0 .3em 0; color:var(--accent); text-transform:none; }
+  .arch ul { margin-left:1em; }
+  .arch li { margin:.15em 0; }
+  .reveal ul.sm { font-size:var(--fs-s); }
+  .reveal ul.sm.m { font-size:var(--fs-m); }
+  .pit li b { color: var(--accent2); }
+  .vid iframe, .vid video { width:100%; aspect-ratio:16/9; border:0; border-radius:8px; background:#000; }
+  .vid .cap { font-size:var(--fs-s); color:var(--muted); margin-top:.3em; }
+  .bars { font-size:var(--fs-s); margin:.4em 0 .6em; }
+  .bars .row { display:flex; align-items:center; gap:.6em; margin:.35em 0; }
+  .bars .lbl { width:9em; color:var(--muted); }
+  .bars .track { flex:1; background:var(--sunk); border-radius:4px; height:1.1em; position:relative; }
+  .bars .fill { background:var(--accent); height:100%; border-radius:4px; }
+  .bars .fill.lat { background:var(--accent2); }
+  .bars .val { width:7em; text-align:right; }
+  .cols > .vid { flex:1 1 0; }
+  .cols > .qr { flex:0 0 31%; text-align:center; }
+  .qr img { width:100%; background:#fff; padding:.4em; border-radius:10px; display:block; }
+  .qr .sub { margin:.5em 0 0; }
+  .flow .n.new { border-color:var(--accent2); box-shadow:inset 0 0 0 1px var(--accent2); }
+  .card { background:var(--box); border:1px solid var(--line); border-radius:10px; padding:.5em 1em; margin:.5em 0; font-size:.9em; }
+  .card h3 { margin:.1em 0 .3em; font-size:1.05em; color:var(--accent); text-transform:none; }
+  .card h3 small { color:var(--muted); font-weight:400; font-size:.75em; margin-left:.6em; }
+  .card p { display:grid; grid-template-columns:6em 1fr; column-gap:.4em; margin:.25em 0; line-height:1.3; }
+  .card p b { color:var(--accent2); }
+  .flow.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.7em; font-size:var(--fs-m); counter-reset:step; }
+  .flow.grid .a { display:none; }
+  .flow.grid { grid-auto-rows:1fr; align-items:stretch; }
+  .flow.grid .n { counter-increment:step; padding:.6em .8em; display:flex; align-items:center; justify-content:flex-start; text-align:left; }
+  .flow.grid .n::before { display:inline-block; min-width:1.1em; margin-right:.2em; content:counter(step) ". "; color:var(--accent2); font-weight:700; }
+  .big li { font-size:1.18em; margin:.55em 0; }
+  .big.tight li { margin:.35em 0; }
+  .vid.wide { width:1040px; margin:0 auto; }
+  .vid.wide .cap, .vid.mid .cap { text-align:center; }
+  .code { font-size:var(--fs-s); background:var(--sunk); border:1px solid var(--line); border-radius:8px; padding:.6em .9em; line-height:1.4; white-space:pre-wrap; }
+  .code code { background:none; padding:0; color:inherit; font-size:1em; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- 1. タイトル (0:20) -->
+<section class="center-slide" data-stackchan-motion="spin" data-stackchan-led='{"pattern":"blink","color":"#00C4FF","speed":6}'>
+  <h1>MAVStackchan</h1>
+  <h2>Stack-chan を MAVLink の機体として見せる</h2>
+  <p class="sub">MAVLink 連携 · reveal.js 連携</p>
+  <p class="sub">発表者名・所属: [要確認]</p>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>1 / 15</b> · タイトル · 目安 <b>0:20</b> · 累計 <b>0:20</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">Stack-chan を、ドローンの地上局ソフトから「機体」として見えるようにしました。<br>今日は、MAVLink との連携と、reveal.js との連携を紹介します。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 何の話か</b>。発表者名・所属はスライドの <b>[要確認]</b> を埋めてから出す。</p></aside>
+</section>
+
+<!-- 2. 全体像 (0:40) -->
+<section data-stackchan-motion="nod" data-stackchan-led='{"pattern":"split_chase","color":"#FF00D6","color2":"#FF9D00","speed":4}'>
+  <h2>全体像: 3 つの経路</h2>
+  <div class="arch">
+    <div class="n"><h3>① MAVLink</h3>
+      <ul><li>Stack-chan → Wi-Fi / UDP</li><li>→ 地上局（QGC）</li><li>姿勢・状態を送る</li></ul></div>
+    <div class="n"><h3>② reveal.js</h3>
+      <ul><li>ブラウザ → WebSocket</li><li><code>ws://&lt;ip&gt;/servo-ws</code></li><li>撫でで操作、動きと LED</li></ul></div>
+    <div class="n"><h3>③ HUD</h3>
+      <ul><li>MAVLink → telemetry.py</li><li>→ serve.py → hud.js</li><li>スライドの上に表示</li></ul></div>
+  </div>
+  <p class="sub" style="margin-top:1em">①と③は同じ MAVLink を使う · ②は PC のサーバーを挟まない</p>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>2 / 15</b> · 全体像 · 目安 <b>0:40</b> · 累計 <b>1:00</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">経路は 3 つあります。<br>1 つ目は、Stack-chan が MAVLink で地上局に状態を送る経路です。<br>2 つ目は、発表資料のブラウザが、Stack-chan に直接 WebSocket でつながる経路です。<br>3 つ目は、同じ MAVLink を PC で受けて、スライドの上に HUD として重ねる経路です。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 3 本の経路の地図</b>。①は <code>direction-win.md</code> 1・2 章、②は同 6 章と <code>en-2/stackchan-bridge.js</code>、③は <code>direction-wsl.md</code> 2.3・2.4。</p></aside>
+</section>
+
+<!-- 3. 何ができているか (0:40) -->
+<section data-stackchan-motion="shake" data-stackchan-led='{"pattern":"split_breath","color":"#0045FF","color2":"#00FF85","speed":7}'>
+  <h2>何ができているか</h2>
+  <ul class="big">
+    <li>Phase 1 · Wi-Fi UDP、HEARTBEAT、GCS 検知 <span class="tag">実機確認済み</span></li>
+    <li>Phase 2 · IMU 姿勢（ATTITUDE 20Hz）と HUD 表示 <span class="tag">実機確認済み</span></li>
+    <li>Phase 3 · ARM / DISARM、HOLD / MANUAL <span class="tag">実機確認済み</span></li>
+    <li>Phase 4 · バーチャルスティックで頭部を動かす <span class="tag">実装済み · [要確認]</span></li>
+    <li>Phase 5 · 表情・音声との統合 <span class="tag">一部実装</span></li>
+  </ul>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>3 / 15</b> · 何ができているか · 目安 <b>0:40</b> · 累計 <b>1:40</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">Phase 1 から 3 までは、実機で確認しています。<br>Phase 4 は、頭部をスティックで動かす部分です。<br>Phase 5 は、今回は一部だけです。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 現状の一覧</b>。出典 <code>direction-win.md</code> 2 章。<b>Phase 4 の確認状況は発表前に確定</b>（[要確認]）。</p></aside>
+</section>
+
+<!-- 4. MAVLink: 姿勢を送る (0:50) -->
+<section data-stackchan-motion="nod" data-stackchan-led='{"pattern":"wave","color":"#00FF2E","speed":6}'>
+  <h2>MAVLink: 姿勢を送る</h2>
+  <div class="cols">
+    <div>
+      <ul class="big">
+        <li>BMI270 を <span class="hl">100Hz</span> で読む</li>
+        <li>相補フィルタで <span class="hl">roll / pitch</span> を推定</li>
+        <li>ATTITUDE を <span class="hl">20Hz</span> で送信</li>
+        <li>起動後 2 秒は水平に静止 → 0 度として扱う</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card">
+        <h3>注意 <small>既知の課題</small></h3>
+        <p><b>ロール</b><span>HUD で左右が逆だったため、符号を反転</span></p>
+        <p><b>ヨー</b><span>磁気補正なしで、時間とともにずれる</span></p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>4 / 15</b> · 姿勢を送る · 目安 <b>0:50</b> · 累計 <b>2:30</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">内蔵の IMU を 100Hz で読み、相補フィルタで傾きを推定しています。<br>それを ATTITUDE として 20Hz で地上局に送っています。<br>起動直後の 2 秒間は、機体を水平に置いて静止させます。その姿勢を 0 度として扱います。<br>ロールは、HUD で見ると左右が逆だったので、符号を反転しています。<br>ヨーは磁気補正が無いので、時間とともにずれます。これは正直に残っている課題です。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: IMU → ATTITUDE</b>。出典 <code>direction-win.md</code> 3 章。水平の取り直しは QGC の Vehicle Setup &gt; Sensors の「Level horizon」（約 2 秒、ARM 中は不可）。</p></aside>
+</section>
+
+<!-- 5. MAVLink: ARM とモードの安全設計 (0:50) -->
+<section data-stackchan-motion="shake" data-stackchan-led='{"pattern":"split_blink","color":"#FF00F1","color2":"#A800FF","speed":6}'>
+  <h2>MAVLink: ARM とモードの安全設計</h2>
+  <ul class="big">
+    <li>起動直後は <span class="hl">HOLD</span> · <span class="hl">DISARMED</span></li>
+    <li>ARM は、地上局とのリンクが生きている間だけ受け付ける</li>
+    <li>リンクが切れたら、<span class="hl">自動で DISARM</span></li>
+    <li>再接続しても、<span class="hl">自動では ARM しない</span></li>
+  </ul>
+  <p class="sub">機体を勝手に動かさないための設計</p>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>5 / 15</b> · ARM とモードの安全設計 · 目安 <b>0:50</b> · 累計 <b>3:20</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">状態は、モードと ARM 状態の 2 つです。起動直後は HOLD で DISARMED です。<br>ARM は、地上局とのリンクが生きているときだけ受け付けます。<br>リンクが切れたら、自動で DISARM します。再接続しても、自動では ARM しません。<br>機体を勝手に動かさないための設計です。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 安全側の設計</b>。出典 <code>direction-win.md</code> 4 章。</p></aside>
+</section>
+
+<!-- 6. MAVLink: 頭部を動かす (0:40) -->
+<section data-stackchan-motion="nod" data-stackchan-led='{"pattern":"wave","color":"#D300FF","speed":8}'>
+  <h2>MAVLink: 頭部を動かす</h2>
+  <div class="cols">
+    <div>
+      <ul class="big">
+        <li>バーチャルスティック → 頭部サーボの角度</li>
+        <li>動くのは <span class="hl">ARM 中かつ MANUAL のとき</span></li>
+        <li>入力が <span class="hl">500ms</span> 届かなければ中立に戻す</li>
+        <li>可動範囲は設定ファイルの上下限を超えない</li>
+      </ul>
+    </div>
+    <div>
+      <div class="card">
+        <h3>対応 <small>符号は反転</small></h3>
+        <p><b>x</b><span>チルト</span></p>
+        <p><b>y</b><span>パン</span></p>
+        <p><b>注意</b><span>Y 軸は中立 90° から 0〜90° のみ</span></p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>6 / 15</b> · 頭部を動かす · 目安 <b>0:40</b> · 累計 <b>4:00</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">地上局のバーチャルスティックの入力を、頭部サーボの角度に変えています。<br>動くのは、ARM 中で、かつ MANUAL のときだけです。<br>入力が 500 ミリ秒届かなければ、中立に戻します。<br>可動範囲は、設定ファイルの上下限を超えません。<br>注意点が 1 つあります。Y 軸は、中立の 90 度から 0 度から 90 度までしか動きません。両側に振るには、設定を変える必要があります。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 操作と安全側の制限</b>。出典 <code>direction-win.md</code> 5 章。<b>[要確認]</b>: 「500ms」はデフォルト値（README 記載）。機体での値は未確認。</p></aside>
+</section>
+
+<!-- 7. MAVLink → HUD (0:50) -->
+<section data-stackchan-motion="shake" data-stackchan-led='{"pattern":"blink","color":"#1DFF00","speed":5}'>
+  <h2>MAVLink → HUD</h2>
+  <div class="flow">
+    <div class="n">Stack-chan</div><span class="a">→ MAVLink</span>
+    <div class="n">telemetry.py</div><span class="a">→ POST</span>
+    <div class="n">serve.py</div><span class="a">→ GET 100ms</span>
+    <div class="n new">hud.js</div>
+  </div>
+  <div class="cols" style="margin-top:.6em">
+    <div>
+      <ul class="sm m">
+        <li>傾き・方位 ← <code>ATTITUDE</code></li>
+        <li>モード・アーム ← <code>HEARTBEAT</code></li>
+        <li>位置 ← <code>GLOBAL_POSITION_INT</code></li>
+        <li>速度・高度 ← <code>VFR_HUD</code></li>
+      </ul>
+    </div>
+    <div>
+      <ul class="sm m">
+        <li>3 秒以上値が来ない → <span class="hl">NO LINK</span></li>
+        <li>位置は、送られるまで POST されない</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>7 / 15</b> · MAVLink → HUD · 目安 <b>0:50</b> · 累計 <b>4:50</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">Stack-chan が送る MAVLink は、もともと地上局用です。<br>PC の telemetry.py が同じ MAVLink を受けて、最新の値を serve.py に送ります。<br>デッキの HUD は、そこから 100 ミリ秒ごとに値を読んで、表示を更新します。<br>3 秒以上値が来なければ、HUD は NO LINK になります。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 経路と対応表</b>。出典 <code>direction-wsl.md</code> 2.3・2.4、<code>telemetry.py</code>、<code>en-2/hud.js</code>。<b>[要確認]</b>: 送信先（UDP の IP とポート）、heartbeat の type と mode 名、送信元の system ID（<code>direction-wsl.md</code> 2.3）。ネットワーク（WSL2 の NAT）は付録に回す。</p></aside>
+</section>
+
+<!-- 8. HUD のデモ (0:40) -->
+<section data-stackchan-motion="nod" data-stackchan-led='{"pattern":"breath","color":"#0078C8","speed":5}'>
+  <h2>HUD のデモ</h2>
+  <div class="ph">ここに HUD のデモ（ライブ、または録画）<br>URL: <code>?sc=&lt;IP&gt;&amp;hud=compact</code></div>
+  <p class="sub" style="margin-top:.6em">録画の場合は「録画」、シミュレーションの場合は「DEMO」と明記</p>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>8 / 15</b> · HUD のデモ · 目安 <b>0:40</b> · 累計 <b>5:30</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">ここで、実際の表示を見てみます。<br>機体を傾けると、姿勢の表示が追いかけます。<br>方位は磁気補正が無いので、ゆっくりずれていくのが分かります。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: デモ</b>。ライブのときは <code>?hud=compact</code> を付けて開く（HUD は既定で非表示）。機体が無いときは <code>?demo</code> で模擬の機体になる（<code>direction-wsl.md</code> 2.6）。<b>[要確認]</b>: 方位のずれを見せるかどうか。</p></aside>
+</section>
+
+<!-- 9. reveal.js 連携: 構成 (0:40) -->
+<section data-stackchan-motion="shake" data-stackchan-led='{"pattern":"split_chase","color":"#3900FF","color2":"#0088FF","speed":3}'>
+  <h2>reveal.js 連携: 構成</h2>
+  <div class="flow">
+    <div class="n">ブラウザ<br><span class="sub">reveal.js + bridge</span></div><span class="a">⇄ WebSocket</span>
+    <div class="n"><code>ws://&lt;ip&gt;/servo-ws</code></div><span class="a">⇄</span>
+    <div class="n">Stack-chan</div>
+  </div>
+  <ul class="big" style="margin-top:.8em">
+    <li>スライド操作は、PC のサーバーを挟まない</li>
+    <li>つなぐ先は URL の <code>sc</code> で指定 → 次回から覚えている</li>
+  </ul>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>9 / 15</b> · reveal.js 連携: 構成 · 目安 <b>0:40</b> · 累計 <b>6:10</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">発表資料は reveal.js で作っています。<br>ブラウザが、Stack-chan に直接 WebSocket でつながります。<br>スライド操作だけなら、PC のサーバーは挟みません。<br>つなぐ先は、URL の sc で指定します。一度指定すれば、次回から覚えています。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 構成</b>。出典 <code>direction-win.md</code> 6 章、<code>stackchan-bridge.js</code>（<code>?sc=</code> は <code>localStorage</code> の <code>stackchan-host</code> に保存）。</p></aside>
+</section>
+
+<!-- 10. 撫でで操作する (0:50) -->
+<section data-stackchan-motion="nod" data-stackchan-led='{"pattern":"wave","color":"#00FF64","speed":7}'>
+  <h2>撫でで操作する</h2>
+  <div class="cols">
+    <div>
+      <ul class="big">
+        <li>頭を <span class="hl">前から後ろへ</span> 撫でる → 次のスライド</li>
+        <li>頭を <span class="hl">後ろから前へ</span> 撫でる → 前のスライド</li>
+      </ul>
+    </div>
+    <div>
+      <ul class="big">
+        <li>頭上 2 回タップ → 挨拶</li>
+        <li>頭上 3 回タップ → うなずき</li>
+        <li>頭上 4 回タップ → 一回転</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>10 / 15</b> · 撫でで操作する · 目安 <b>0:50</b> · 累計 <b>7:00</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">頭を撫でると、スライドが進みます。<br>2 回タップすると挨拶、3 回でうなずき、4 回で一回転します。<br>発表者は、手元で何も押さなくて済みます。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 操作一覧</b>。出典 <code>direction-win.md</code> 6 章。WSL 側が受けるのは <code>control</code> の <code>next</code> / <code>prev</code> だけ（<code>stackchan-bridge.js</code>）。挨拶などの動作は機体側。</p></aside>
+</section>
+
+<!-- 11. スライドごとの指定 (0:50) -->
+<section data-stackchan-motion="spin" data-stackchan-led='{"pattern":"split_wave","color":"#00FFA4","color2":"#FF0300","speed":3}'>
+  <h2>スライドごとの指定</h2>
+  <div class="code"><code>&lt;section data-stackchan-motion="nod"
+         data-stackchan-led='{"pattern":"breath","color":"#0078C8","speed":5}'&gt;</code></div>
+  <ul class="big" style="margin-top:.6em">
+    <li><code>data-stackchan-expression</code>: neutral / happy / sad / angry / doubt / sleepy（省略時は 6 枚ごとの循環）</li>
+    <li><code>data-stackchan-motion</code>: nod / shake / spin / none</li>
+    <li><code>data-stackchan-led</code>: 次のスライドまで保持</li>
+    <li>吹き出し: 見出し（または <code>data-stackchan-title</code>）、40 文字まで</li>
+  </ul>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>11 / 15</b> · スライドごとの指定 · 目安 <b>0:50</b> · 累計 <b>7:50</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">スライドごとに、動きと LED を HTML の属性で指定できます。<br>発表者が設定画面をいじる必要はありません。<br>吹き出しには、そのスライドの見出しが出ます。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 書き方</b>。出典 <code>stackchan-bridge.js</code>。<b>[要確認]</b>: 表情（<code>data-stackchan-expression</code>）は、WSL の bridge が送っていないので、このデッキでは扱わない（<code>direction-wsl.md</code> 2.2）。</p></aside>
+</section>
+
+<!-- 12. 注意点 (0:30) -->
+<section data-stackchan-motion="shake" data-stackchan-led='{"pattern":"split_blink","color":"#FF1100","color2":"#FF00A6","speed":6}'>
+  <h2>注意点</h2>
+  <ul class="big">
+    <li>手動で操作している間は、スライドによる首の動きは止まる</li>
+    <li>https のページからは <code>ws://</code> に接続できない → PC でローカル配信</li>
+    <li>HUD は <code>serve.py</code> 経由で開く（file:// では動かない）</li>
+  </ul>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>12 / 15</b> · 注意点 · 目安 <b>0:30</b> · 累計 <b>8:20</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">注意点が 3 つあります。<br>手で操作している間は、スライドの首の動きは止まります。<br>公開された https のページからは、機体につながりません。その場合は、PC でローカル配信します。<br>HUD を使うなら、PC の serve.py 経由で開きます。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 当日の落とし穴</b>。出典 <code>direction-win.md</code> 6 章、<code>direction-wsl.md</code> 2.7。</p></aside>
+</section>
+
+<!-- 13. 課題と次のステップ (0:30) -->
+<section data-stackchan-motion="nod" data-stackchan-led='{"pattern":"blink","color":"#FF00D6","speed":7}'>
+  <h2>課題と次のステップ</h2>
+  <ul class="big">
+    <li>ヨーのドリフト（磁気補正なし）</li>
+    <li>Stack-chan の MAVLink を WSL に届ける（WSL2 のネットワーク）</li>
+    <li>表情の送り方（機体側か、WSL 側か）</li>
+    <li>カメラ映像の HUD は保留（内蔵カメラは前方を映さない）</li>
+  </ul>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>13 / 15</b> · 課題と次のステップ · 目安 <b>0:30</b> · 累計 <b>8:50</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">残っている課題は 4 つです。<br>ヨーのずれ、WSL へのネットワーク、表情の扱いです。<br>カメラ映像の HUD は、内蔵カメラが前方を向かないので、いまは保留にしています。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 残課題</b>。出典 <code>direction-win.md</code> 10 章、<code>direction-wsl.md</code> 2.4。</p></aside>
+</section>
+
+<!-- 14. まとめ (0:20) -->
+<section class="center-slide" data-stackchan-motion="nod" data-stackchan-led='{"pattern":"wave","color":"#00FF2E","speed":6}'>
+  <h2>まとめ</h2>
+  <ul class="big" style="display:inline-block;text-align:left">
+    <li>姿勢と状態は、MAVLink で地上局と HUD に出る</li>
+    <li>ARM と頭部の動きは、安全のために条件を絞っている</li>
+    <li>頭を撫でてスライドを進め、動きと LED が連動する</li>
+  </ul>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>14 / 15</b> · まとめ · 目安 <b>0:20</b> · 累計 <b>9:10</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">まとめます。<br>姿勢と状態は、MAVLink で地上局に出て、スライドの HUD にも出ます。<br>ARM と頭部の動きは、安全のために条件を絞っています。<br>頭を撫でると、スライドが進み、動きと LED も連動します。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 3 行まとめ</b>。出典 <code>direction-win.md</code> 11 章。</p></aside>
+</section>
+
+<!-- 15. 質疑 (-) -->
+<section class="center-slide" data-stackchan-motion="spin" data-stackchan-led='{"pattern":"blink","color":"#15FF00","speed":7}'>
+  <h2>ご質問をどうぞ</h2>
+  <div class="ph" style="max-width:520px;margin:1em auto 0">リンク・QR（資料の準備後に入れる）</div>
+  <aside class="notes"><p style="font-size:.9em;color:#888;margin:0 0 .6em"><b>15 / 15</b> · 質疑 · 累計 <b>9:10</b> / 9:10</p><p style="font-size:1.25em;line-height:1.55;margin:.5em 0">ご質問があれば、お願いします。</p><hr><p style="font-size:.85em;line-height:1.5;color:#888;margin:.4em 0"><b>役割: 質疑</b>。QR とリンクの中身は未決定（[要確認]）。</p></aside>
+</section>
+
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/notes/notes.min.js"></script>
+<script src="../en-2/stackchan-bridge.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="../en-2/hud.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true, center: false, slideNumber: 'c/t', width: 1280, height: 720,
+    transition: 'fade', preloadIframes: false, plugins: [ RevealNotes, StackchanBridge ]
+  });
+  // keep the presenter page (script-first presenter) in sync with this window
+  try {
+    const bc = new BroadcastChannel('slide-hud-stackchan');
+    Reveal.on('ready', e => bc.postMessage({ t: 'slide', h: e.indexh }));
+    Reveal.on('slidechanged', e => bc.postMessage({ t: 'slide', h: e.indexh }));
+    bc.onmessage = m => { if (m.data && m.data.t === 'goto') Reveal.slide(m.data.h, 0); };
+    // relay the slide to other devices via serve.py; no-op when opened from file://
+    const sync = h => fetch('../api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ h }), keepalive: true }).catch(() => {});
+    Reveal.on('ready', e => sync(e.indexh));
+    Reveal.on('slidechanged', e => sync(e.indexh));
+    // follow the presenter when it is on another device: move only when the server's slide changes
+    let lastSeen = null;
+    setInterval(async () => {
+      try {
+        const s = await (await fetch('../api/state', { cache: 'no-store' })).json();
+        if (s && s.h !== undefined && s.h !== lastSeen) { lastSeen = s.h; if (s.h !== Reveal.getIndices().h) Reveal.slide(s.h, 0); }
+      } catch (e) {}
+    }, 400);
+  } catch (e) {}
+</script>
+<script src="stackchan-card.js"></script>
+</body>
+</html>
